@@ -6,20 +6,20 @@ This repository contains comprehensive documentation for integrating Contentstac
 
 ### Core Concepts
 
-- **[Base Concepts](01-live-preview-base-concepts.md)** - Fundamental concepts, terminology, and setup process
-- **[Implementation Guide](02-live-preview-implementation.md)** - Comprehensive implementation guide covering all frameworks
+- **[Base Concepts](.contentstack-vibe-docs/01-live-preview-base-concepts.md)** - Fundamental concepts, terminology, and setup process
+- **[Implementation Guide](.contentstack-vibe-docs/02-live-preview-implementation.md)** - Comprehensive implementation guide covering all frameworks
 
 ### Framework-Specific Guides
 
 #### Next.js
 
-- **[Next.js CSR](live-preview-next-csr.md)** - Client-Side Rendering implementation
-- **[Next.js SSR](live-preview-next-ssr.md)** - Server-Side Rendering implementation
+- **[Next.js CSR](.contentstack-vibe-docs/03-live-preview-next-csr.md)** - Client-Side Rendering implementation
+- **[Next.js SSR](.contentstack-vibe-docs/04-live-preview-next-ssr.md)** - Server-Side Rendering implementation
 
 #### Nuxt 4
 
-- **[Nuxt CSR](live-preview-nuxt-csr.md)** - Client-Side Rendering with real-time updates
-- **[Nuxt SSR](live-preview-nuxt-ssr.md)** - Server-Side Rendering with page refresh behavior
+- **[Nuxt CSR](.contentstack-vibe-docs/05-live-preview-nuxt-csr.md)** - Client-Side Rendering with real-time updates
+- **[Nuxt SSR](.contentstack-vibe-docs/06-live-preview-nuxt-ssr.md)** - Server-Side Rendering with page refresh behavior
 
 ## Key Features
 
