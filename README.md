@@ -8,7 +8,6 @@ This repository contains comprehensive documentation for integrating Contentstac
 
 - **[Base Concepts](01-live-preview-base-concepts.md)** - Fundamental concepts, terminology, and setup process
 - **[Implementation Guide](02-live-preview-implementation.md)** - Comprehensive implementation guide covering all frameworks
-- **[IDE Integration](07-ide-integration.md)** - How to integrate these docs into your development environment
 
 ### Framework-Specific Guides
 
