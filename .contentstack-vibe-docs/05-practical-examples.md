@@ -2,6 +2,20 @@
 
 This guide provides real-world implementation examples that AI coding assistants need when building applications with Contentstack.
 
+**Note**: Each example includes stack initialization for clarity. In production, you should create a single stack instance and reuse it across your application. Consider creating a shared module like `lib/contentstack.ts`:
+
+```typescript
+// lib/contentstack.ts
+import contentstack from "@contentstack/delivery-sdk";
+
+export const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+```
+
 ## Table of Contents
 
 1. [Rendering Rich Text](#rendering-rich-text)
@@ -88,6 +102,15 @@ export default async function BlogPost({ entry }: { entry: BlogPost }) {
 ### Single Reference
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch entry with author reference
 const entry = await stack
   .contentType("blog_post")
@@ -114,6 +137,15 @@ function BlogPost({ entry }: { entry: BlogPost }) {
 ### Multiple References
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch entry with multiple references
 const entry = await stack
   .contentType("blog_post")
@@ -143,6 +175,15 @@ function BlogPost({ entry }: { entry: BlogPost }) {
 ### Reference Arrays
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Entry has a reference field that's an array
 const entry = await stack
   .contentType("page")
@@ -176,11 +217,18 @@ function Page({ entry }: { entry: Page }) {
 ### Basic Modular Blocks
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+import DOMPurify from "isomorphic-dompurify";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch entry with modular blocks
-const entry = await stack
-  .contentType("page")
-  .entry("entry_uid")
-  .fetch();
+const entry = await stack.contentType("page").entry("entry_uid").fetch();
 
 // Entry structure:
 // {
@@ -204,9 +252,7 @@ function Page({ entry }: { entry: Page }) {
           case "hero_block":
             return <HeroBlock key={blockItem._metadata.uid} block={block} />;
           case "content_block":
-            return (
-              <ContentBlock key={blockItem._metadata.uid} block={block} />
-            );
+            return <ContentBlock key={blockItem._metadata.uid} block={block} />;
           case "cta_block":
             return <CTABlock key={blockItem._metadata.uid} block={block} />;
           default:
@@ -222,9 +268,7 @@ function HeroBlock({ block }: { block: HeroBlock }) {
   return (
     <section className="hero">
       <h2>{block.title}</h2>
-      {block.image && (
-        <img src={block.image.url} alt={block.image.title} />
-      )}
+      {block.image && <img src={block.image.url} alt={block.image.title} />}
       {block.description && <p>{block.description}</p>}
     </section>
   );
@@ -303,6 +347,15 @@ The Images API supports various transformation parameters:
 ### Basic Image URLs
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Basic asset URL
 const imageUrl = entry.image.url; // https://images.contentstack.io/v3/assets/...
 
@@ -328,6 +381,8 @@ const thumbnailUrl = getImageUrl(entry.image, 400, 300);
 ### Advanced Image Transformations
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
 interface ImageTransformOptions {
   width?: number;
   height?: number;
@@ -350,9 +405,7 @@ function transformImageUrl(
   if (options.fit) params.append("fit", options.fit);
   if (options.auto) params.append("auto", options.auto);
 
-  return params.toString()
-    ? `${asset.url}?${params.toString()}`
-    : asset.url;
+  return params.toString() ? `${asset.url}?${params.toString()}` : asset.url;
 }
 
 // Examples
@@ -419,6 +472,17 @@ function ResponsiveImage({ asset }: { asset: Asset }) {
 ### Blog Listing Page
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+import { useState, useEffect } from "react";
+import Link from "next/link"; // or your routing library
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch blog posts with pagination
 async function getBlogPosts(page: number = 1, pageSize: number = 10) {
   const skip = (page - 1) * pageSize;
@@ -478,6 +542,17 @@ function BlogListing() {
 ### Single Blog Post Page
 
 ```typescript
+import contentstack, { QueryOperation } from "@contentstack/delivery-sdk";
+import { useState, useEffect } from "react";
+import DOMPurify from "isomorphic-dompurify";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch single post by URL
 async function getBlogPostByUrl(url: string) {
   const result = await stack
@@ -525,6 +600,17 @@ function BlogPost({ url }: { url: string }) {
 ### Navigation Menu
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+import { useState, useEffect } from "react";
+import Link from "next/link"; // or your routing library
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch navigation items
 async function getNavigation() {
   const result = await stack
@@ -647,6 +733,15 @@ interface Page extends BaseEntry {
 ### Type-Safe Fetch Functions
 
 ```typescript
+import contentstack, { QueryOperation } from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 async function getBlogPost(uid: string): Promise<BlogPost | null> {
   try {
     const entry = await stack
@@ -686,6 +781,15 @@ async function getBlogPosts(filters?: {
 ### Fetch Entry in Specific Locale
 
 ```typescript
+import contentstack from "@contentstack/delivery-sdk";
+
+const stack = contentstack.stack({
+  apiKey: process.env.CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+  region: process.env.CONTENTSTACK_REGION || "us",
+});
+
 // Fetch entry in French locale
 const entry = await stack
   .contentType("page")
@@ -715,6 +819,8 @@ async function getEntryWithFallback(
 ### Locale Switcher Component
 
 ```typescript
+import { useRouter } from "next/router"; // or your routing library
+
 const SUPPORTED_LOCALES = ["en-us", "fr-fr", "de-de"];
 
 function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
@@ -742,6 +848,4 @@ function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
 ## Next Steps
 
 - Review [SDK Functionalities](02-sdk-functionalities.md) for more query patterns
-- Learn about [Live Preview Implementation](03a-live-preview-implementation.md) for real-time updates
-- Explore [Personalization Setup](04-personalization-setup.md) for personalized content
-
+- Learn about [Live Preview Guide](03-live-preview-guide.md) for real-time updates

@@ -1,50 +1,124 @@
-# Contentstack Live Preview: Implementation Guide for AI Agents
+# Contentstack Live Preview: Complete Guide for AI Agents
 
 This guide consolidates everything needed to implement Contentstack's **Live Preview** feature.
 It is written for AI coding assistants and assumes you can generate and insert code directly into a project.
 The instructions are self-contained and avoid cross-referencing other documents.
 
-## 1. Overview
+## 1. What is Live Preview?
 
-Contentstack's Live Preview lets editors view changes to content immediately, across devices and locales, without publishing.
-When an entry is opened in the CMS, Contentstack appends a **Live Preview hash** to the preview URL and loads your website in an iframe.
-A JavaScript library called the **Live Preview Utils SDK** runs in your website and communicates with the CMS using the `postMessage` API.
-It listens for content-change events and updates the page accordingly. Live Preview supports both **client-side rendering (CSR)** and **server-side rendering (SSR)** frameworks.
+Contentstack's **Live Preview** feature lets content managers see changes instantly before publishing. Whenever an editor opens an entry, the CMS generates a _Live Preview hash_ that identifies the preview session and links the entry editor with the website loaded in an iframe. The Live Preview Utils SDK running on the site uses `postMessage()` events to communicate with the entry editor, fetches the latest content and injects it into the preview panel without reloading.
 
-## 2. Key Concepts
+**How it works:**
+- Editor opens an entry in Contentstack CMS
+- CMS generates a Live Preview hash and appends it to the preview URL
+- Website loads in an iframe with the hash in query parameters
+- Live Preview Utils SDK detects the hash and connects to the CMS
+- SDK listens for content changes and updates the preview in real-time
+- For CSR: Content updates instantly without page reload
+- For SSR: Page refreshes to show updated content
 
-- **Preview token** - A special API token generated from **Settings → Tokens → Delivery Tokens**. It is associated with a delivery token and is used to fetch unpublished content. Do not use your management token for Live Preview.
-- **Live Preview hash** - A session-specific identifier that Contentstack adds to preview URLs. When this hash is present, your application must fetch data from the preview endpoints and include the hash and preview token in API headers. When absent, use the normal delivery endpoints.
-- **Live Preview Utils SDK** - A JavaScript package (`@contentstack/live-preview-utils`) that manages the connection between the CMS and your site. It works with Contentstack's GraphQL, REST and Gatsby SDKs. You initialise it once with configuration options and then register event handlers.
-- **Live Edit tags** - HTML attributes (`data-cslp`) that map elements in your site to fields in the entry. When you click the edit button in the preview panel, the CMS uses these tags to focus the correct field. Tags can be generated automatically via `addEditableTags()` from the Contentstack Utils SDK.
+**Benefits:**
+- Editors see changes immediately without publishing
+- Preview works across different device sizes and locales
+- Enables real-time content editing experience
+- Reduces publishing errors and improves content quality
 
-## 3. Prerequisites
+## 2. Key Concepts and Terminology
+
+| Concept                  | Description                                                                                                                                                                                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Live Preview hash**      | A session-specific ID appended to preview URLs (e.g., `?live_preview=abc123`). It identifies the editor session and ensures the preview shows the latest unpublished changes.                                                                                                                                              |
+| **Preview token**          | A special API token (generated from **Settings → Tokens → Delivery Tokens**) that allows the site to call preview endpoints. It's associated with a delivery token and should be used for Live Preview instead of a management token.                                                       |
+| **Live Preview Utils SDK** | JavaScript library (`@contentstack/live-preview-utils`) that connects the CMS and the front-end. It listens for entry-change events, injects content, adds edit buttons and supports edit tags. Version 3 introduces modes (`preview` vs `builder`), configurable Edit/Start Editing buttons and improved configuration options. |
+| **Live Edit tags**         | Special `data-cslp` attributes pointing to the path of a field (e.g., `content_type.entry.locale.field`). The SDK reads these tags to highlight fields and show Edit buttons. Tags can be added manually or generated automatically with `addEditableTags()`.                                |
+| **CSR Mode**              | Client-Side Rendering mode - Content updates instantly without page refresh. Use `ssr: false` when initializing the SDK.                                                                                                                                    |
+| **SSR Mode**              | Server-Side Rendering mode - Page refreshes when content changes. Use `ssr: true` when initializing the SDK.                                                                                                                                                                    |
+| **Preview Service**       | New service that replaces the Content Management API (CMA) for preview requests. Uses `rest-preview.contentstack.com` or `graphql-preview.contentstack.com` endpoints.                                                                                                           |
+
+## 3. Prerequisites and Setup
 
 Before adding Live Preview support, ensure the following:
 
-1. You have a Contentstack **stack** with at least one **environment**.
-2. Live Preview is **enabled** on the stack:
-   1. Navigate to **Settings → Environments** and enter the **base URL** for each locale.
-   2. Under **Live Preview**, tick **Enable Live Preview** and select a default preview environment.
-3. You have a **preview token** (generated from **Settings → Tokens → Delivery Tokens**). Copy this token; it will be used in code.
-4. Your website is served over **HTTPS** and can be embedded in an iframe. Disable X-Frame-Options headers or set them appropriately.
+### 3.1 Enable Live Preview in Contentstack
 
-## 4. Common Setup Steps
+1. Navigate to **Settings → Environments** in your Contentstack stack
+2. Set the **base URL** for each locale (e.g., `https://your-site.com`)
+3. Under **Live Preview**, tick **Enable Live Preview**
+4. Select a default preview environment (usually `preview` or `development`)
+5. Save settings
+
+When enabled, an eye icon (👁️) appears in the entry editor sidebar.
+
+### 3.2 Generate a Preview Token
+
+1. Go to **Settings → Tokens → Delivery Tokens**
+2. Select an existing delivery token or create a new one
+3. Toggle **Create preview token**
+4. Copy the preview token (you'll need this in your code)
+
+**Important**: The preview token is associated with a delivery token. Use this preview token (not the management token) for Live Preview functionality.
+
+### 3.3 Host Requirements
+
+Your website must meet these requirements:
+
+- **HTTPS**: Site must be served over HTTPS (required for iframe embedding)
+- **Iframe-Compatible**: Site must allow embedding in iframes
+  - Remove or configure `X-Frame-Options` headers
+  - Ensure `Content-Security-Policy` allows iframe embedding if used
+- **Publicly Accessible**: Site must be accessible from the internet (Contentstack needs to load it in an iframe)
+
+**Hosting Options:**
+- Contentstack's **Launch** service (recommended for easy setup)
+- Any hosting provider (Vercel, Netlify, AWS, etc.)
+- Local development with tunneling service (ngrok, Cloudflare Tunnel, etc.)
+
+## 4. How to Set Up Live Preview
+
+Below is a consolidated step-by-step outline. The exact code varies by framework, but the high-level process is consistent.
+
+### 4.1 High-Level Setup Process
+
+1. **Enable Live Preview in the stack** (see [Prerequisites](#3-prerequisites-and-setup))
+2. **Generate a Preview token** (see [Prerequisites](#3-prerequisites-and-setup))
+3. **Build your site with a Contentstack SDK** - Configure SDK with Live Preview support
+4. **Host the site** on a secure domain (HTTPS, iframe-compatible)
+5. **Implement Live Edit tags** (optional but recommended)
+6. **Configure edit buttons** via SDK configuration
+
+### 4.2 Framework-Specific Setup Patterns
+
+The SDK will be configured differently for CSR or SSR:
+
+- **GraphQL - CSR**: Initialize `@contentstack/live-preview-utils` with `ssr: false`, `enable: true`, stack details and client URL parameters. When the preview hash is present, change the GraphQL host from `graphql.contentstack.com` to `graphql-preview.contentstack.com` and add `live_preview`, `preview_token` and `include_applied_variants` headers. Use `onEntryChange()` inside `useEffect` to refetch data when an entry changes.
+
+- **GraphQL - SSR**: Similar to CSR but set `ssr: true`. On the server, extract the hash from the query parameters and pass it to the GraphQL request headers; re-initialize the SDK for each request to avoid cross-session data.
+
+- **Gatsby (uses GraphQL)**: Create a `live-preview.js` module that instantiates `ContentstackGatsby` with `preview_token`, environment and host; install and initialize the Live Preview Utils SDK; connect `onLiveEdit()` to fetch updated data and update component state. Add `__typename` and `uid` to GraphQL queries; use `addEditableTags()` to generate edit tags.
+
+- **REST - CSR**: Configure the Delivery SDK with a `live_preview` object containing `preview_token`, `enable: true` and `host: 'rest-preview.contentstack.com'`. Initialize the Live Preview Utils SDK (`ssr: false`) and use `onEntryChange()` to refetch data.
+
+- **REST - SSR**: Same as CSR but set `ssr: true`. On each server request, create a fresh stack instance and call `Stack.livePreviewQuery(req.query)` to inject the hash into API calls. Always create a new SDK instance per request to avoid showing wrong preview data across users.
+
+### 4.3 Common Implementation Steps
 
 The following steps apply to all frameworks and rendering modes:
 
-1. **Import the necessary SDKs** - use the Contentstack SDK (`@contentstack/delivery-sdk`) and install `@contentstack/live-preview-utils` via npm or a script tag.
+1. **Import the necessary SDKs** - Use the Contentstack SDK (`@contentstack/delivery-sdk`) and install `@contentstack/live-preview-utils` via npm.
 
-- THIS IS VERY IMPORTANT: ALWAYS USE THE TYPESCRIPT DELIVERY SDK (`@contentstack/delivery-sdk`) WHEN YOU QUERY CONTENTSTACK!
+   **CRITICAL**: ALWAYS USE THE TYPESCRIPT DELIVERY SDK (`@contentstack/delivery-sdk`) WHEN YOU QUERY CONTENTSTACK!
 
-2. **Configure the SDK** - always include a `live_preview` configuration when creating the SDK instance. Set `enable: true`, pass your `preview_token` and specify the correct `host` (see [Region Hosts](#10-region-hosts)).
-3. **Initialise the Live Preview Utils SDK**. Call `ContentstackLivePreview.init()` once on the client side. Specify whether you are using SSR (`ssr: true`) or CSR (`ssr: false`), and provide:
+2. **Configure the SDK** - Always include a `live_preview` configuration when creating the SDK instance. Set `enable: true`, pass your `preview_token` and specify the correct `host` (see [Region Hosts](#10-region-hosts)).
+
+3. **Initialize the Live Preview Utils SDK** - Call `ContentstackLivePreview.init()` once on the client side. Specify whether you are using SSR (`ssr: true`) or CSR (`ssr: false`), and provide:
    - `stackDetails`: object with `apiKey`, `environment` and optional `branch`.
    - `stackSdk`: reference to your Contentstack SDK instance (for Gatsby use `ContentstackGatsby.stackSdk`).
    - `editButton`: optional object to enable/disable the Edit button and set its position.
    - `clientUrlParams`: optional object with `protocol`, `host` and `port` of the Contentstack app (defaults to `https://app.contentstack.com`).
-4. **React to content changes** - register event handlers to fetch fresh data when the editor updates an entry. Use `onEntryChange()` in CSR contexts and `onLiveEdit()` when you only want to update while editing.
-5. **Add Live Edit tags** - either manually add `data-cslp="contentType.entry.locale.field"` to your HTML or call `addEditableTags(entry, content_type_uid, tagsAsObject, locale)` after fetching data to append tags automatically. When using JSX, pass tags as an object (`{ 'data-cslp': 'path' }`).
+
+4. **React to content changes** - Register event handlers to fetch fresh data when the editor updates an entry. Use `onEntryChange()` in CSR contexts and `onLiveEdit()` when you only want to update while editing.
+
+5. **Add Live Edit tags** - Either manually add `data-cslp="contentType.entry.locale.field"` to your HTML or call `addEditableTags(entry, content_type_uid, tagsAsObject, locale)` after fetching data to append tags automatically. When using JSX, pass tags as an object (`{ 'data-cslp': 'path' }`).
 
 ## 5. Choosing CSR vs SSR
 
@@ -440,13 +514,38 @@ In React:
 
 Select the correct host based on your stack's region. Use the same host for both the `live_preview.host` option and the `clientUrlParams.host` when initialising the SDK.
 
-## 11. Migrating to the Preview Service
+## 11. Additional Features
 
-If you built Live Preview using the old Content Management API (CMA), switch to the Preview Service for improved performance:
+### Preview Service
+
+Contentstack has introduced a new Preview Service that replaces the Content Management API (CMA) for preview requests. This provides improved performance and better reliability.
+
+**Migrating to Preview Service:**
+
+If you built Live Preview using the old Content Management API (CMA), switch to the Preview Service:
 
 1. **Change the API base URL** in your code from `api.contentstack.io` to `rest-preview.contentstack.com` (for REST) or from `graphql.contentstack.com` to `graphql-preview.contentstack.com` (for GraphQL).
 2. **Replace the management token with your preview token**.
 3. **When a preview hash is present**, include it as the `live_preview` header and set `preview_token` in the headers. Only switch the host to the preview host when the hash exists; otherwise use the normal CDN host.
+
+### SDK Version 3 Features
+
+Version 3 of the Live Preview Utils SDK introduces:
+
+- **Mode Property**: `preview` for Live Preview and `builder` for Visual Builder
+- **Start Editing Button**: Quickly switch to edit mode in Visual Builder
+- **Improved Configuration**: More flexible configuration options
+- **Clean Production Tags**: Use `cleanCslpOnProduction` to remove all `data-cslp` attributes in production
+
+### Event-Based Communication
+
+The SDK relies on events to keep the preview in sync:
+
+- **`init-ack`**: Sent when the session starts
+- **`client-data-send`**: Triggers content update
+- **`entry-change`**: Fired when entry content changes
+
+These events enable real-time communication between the CMS and your website without requiring page refreshes (in CSR mode).
 
 ## 12. Framework-Specific Patterns
 

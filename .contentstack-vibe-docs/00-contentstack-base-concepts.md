@@ -356,5 +356,4 @@ Contentstack uses a global CDN to deliver content:
 
 - Learn about [API Functionalities](01-api-functionalities.md)
 - Learn about [SDK Functionalities](02-sdk-functionalities.md)
-- Learn about [Live Preview Setup](03-live-preview-base-concepts.md)
-- Learn about [Personalization Setup](04-personalization-setup.md)
+- Learn about [Live Preview Guide](03-live-preview-guide.md)

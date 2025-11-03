@@ -630,6 +630,4 @@ async function getRecentPosts(limit: number = 5) {
 
 ## Next Steps
 
-- Learn about [Live Preview Setup](03-live-preview-base-concepts.md)
-- Learn about [Live Preview Implementation](03a-live-preview-implementation.md)
-- Learn about [Personalization Setup](04-personalization-setup.md)
+- Learn about [Live Preview Guide](03-live-preview-guide.md)

@@ -10,6 +10,7 @@ Contentstack provides two main APIs for content delivery:
 2. **GraphQL API**: Flexible GraphQL queries for precise data fetching
 
 Both APIs support:
+
 - Published content delivery (via Delivery Token)
 - Unpublished content preview (via Preview Token)
 - Multiple regions and environments
@@ -25,6 +26,7 @@ https://{region}-cdn.contentstack.io/v3/{resource}
 ```
 
 **Preview Base URL** (when using Preview Token):
+
 ```
 https://{region}-rest-preview.contentstack.com/v3/{resource}
 ```
@@ -39,6 +41,7 @@ access_token: YOUR_DELIVERY_TOKEN
 ```
 
 **For Preview** (unpublished content):
+
 ```http
 api_key: YOUR_API_KEY
 access_token: YOUR_PREVIEW_TOKEN
@@ -54,10 +57,12 @@ GET /v3/content_types/{content_type_uid}/entries/{entry_uid}
 ```
 
 **Query Parameters:**
+
 - `environment`: Environment name (required)
 - `locale`: Locale code (optional, defaults to default locale)
 
 **Example Request:**
+
 ```bash
 curl -X GET \
   'https://cdn.contentstack.io/v3/content_types/blog_post/entries/entry_uid?environment=production&locale=en-us' \
@@ -72,6 +77,7 @@ GET /v3/content_types/{content_type_uid}/entries
 ```
 
 **Query Parameters:**
+
 - `environment`: Environment name (required)
 - `locale`: Locale code (optional)
 - `query`: JSON query for filtering (optional)
@@ -82,6 +88,7 @@ GET /v3/content_types/{content_type_uid}/entries
 - `desc`: Field to sort descending
 
 **Example Query:**
+
 ```json
 {
   "query": {
@@ -112,6 +119,7 @@ Contentstack REST API supports MongoDB-style query operators:
 - `$or`: Logical OR
 
 **Example:**
+
 ```json
 {
   "query": {
@@ -131,6 +139,7 @@ GET /v3/assets/{asset_uid}
 ```
 
 **Query Parameters:**
+
 - `environment`: Environment name (required)
 - `version`: Asset version (optional)
 
@@ -141,6 +150,7 @@ GET /v3/assets
 ```
 
 **Query Parameters:**
+
 - `environment`: Environment name (required)
 - `query`: JSON query for filtering
 - `skip`, `limit`: Pagination
@@ -154,11 +164,13 @@ GET /v3/content_types/{content_type_uid}/entries/{entry_uid}?include[]=reference
 ```
 
 **Multiple References:**
+
 ```http
 GET /v3/content_types/{content_type_uid}/entries/{entry_uid}?include[]=author&include[]=category&include[]=tags
 ```
 
 **Deep Includes** (include references within references):
+
 ```http
 GET /v3/content_types/{content_type_uid}/entries/{entry_uid}?include[]=author.published_date
 ```
@@ -170,6 +182,7 @@ GET /v3/content_types/{content_type_uid}/entries?include_count=true
 ```
 
 Response includes:
+
 ```json
 {
   "entries": [...],
@@ -180,6 +193,7 @@ Response includes:
 ### Response Format
 
 **Single Entry:**
+
 ```json
 {
   "entry": {
@@ -203,6 +217,7 @@ Response includes:
 ```
 
 **Multiple Entries:**
+
 ```json
 {
   "entries": [
@@ -222,6 +237,7 @@ https://{region}-graphql.contentstack.com/graphql
 ```
 
 **Preview Base URL**:
+
 ```
 https://{region}-graphql-preview.contentstack.com/graphql
 ```
@@ -236,6 +252,7 @@ access_token: YOUR_DELIVERY_TOKEN
 ```
 
 **For Preview**:
+
 ```http
 api_key: YOUR_API_KEY
 access_token: YOUR_PREVIEW_TOKEN
@@ -276,6 +293,7 @@ query GetEntry($uid: String!) {
 ```
 
 **Variables:**
+
 ```json
 {
   "uid": "entry_uid"
@@ -326,6 +344,7 @@ query {
 ```
 
 **Filter Operators:**
+
 - `eq`: Equal to
 - `ne`: Not equal to
 - `gt`: Greater than
@@ -426,6 +445,7 @@ query {
 ### REST API Errors
 
 **Status Codes:**
+
 - `200`: Success
 - `400`: Bad Request (invalid query)
 - `401`: Unauthorized (invalid token)
@@ -434,6 +454,7 @@ query {
 - `500`: Server Error
 
 **Error Response:**
+
 ```json
 {
   "error_code": 141,
@@ -470,6 +491,7 @@ Both APIs have rate limits:
 - **Management API**: Different limits based on subscription
 
 **Rate Limit Headers:**
+
 ```http
 X-RateLimit-Limit: 10000
 X-RateLimit-Remaining: 9950
@@ -478,51 +500,249 @@ X-RateLimit-Reset: 1640995200
 
 ## Best Practices
 
+Based on [Contentstack's official API best practices](https://www.contentstack.com/docs/developers/apis/content-delivery-api), follow these guidelines for optimal API usage:
+
 ### 1. Use Appropriate Tokens
 
 - **Delivery Token**: For production applications
 - **Preview Token**: For Live Preview and development
 - **Management Token**: Only for backend operations
 
-### 2. Include Only What You Need
+**Security Note**: Never store API keys and tokens in your code or version control. Use environment variables and secure storage.
 
-**REST:**
+### 2. Limit Response Payload
+
+**CRITICAL**: Keep response payloads under **5 MB** to avoid performance issues and infrastructure load.
+
+**Best Practices:**
+
+- Validate and filter data before returning to client
+- Remove unnecessary fields from responses
+- Use projection queries to limit fields returned
+
+### 3. Optimize Includes and Reference Depth
+
+**Limit Includes:**
+
+- Keep total number of includes to **10 or fewer**
+- Avoid deep nesting of references
+- Only include references you actually need
+
+**Example - Too Many Includes (Avoid):**
+
 ```http
-GET /v3/content_types/blog_post/entries?only[BASE][]=title&only[BASE][]=url
+GET /v3/content_types/blog_post/entries/entry_uid?include[]=author&include[]=category&include[]=tags&include[]=related_posts&include[]=comments&include[]=likes&include[]=shares&include[]=metadata&include[]=translations&include[]=variants
 ```
 
-**GraphQL:**
+**Example - Optimized Includes:**
+
+```http
+GET /v3/content_types/blog_post/entries/entry_uid?include[]=author&include[]=category
+```
+
+**Split Large Includes:**
+If you need many references, split them into multiple calls:
+
+```typescript
+// Instead of one call with 10 includes
+const entry = await fetchEntryWithManyIncludes(uid);
+
+// Split into multiple calls
+const entry = await fetchEntry(uid);
+const author = await fetchAuthor(entry.author_uid);
+const category = await fetchCategory(entry.category_uid);
+// ... fetch other references as needed
+```
+
+### 4. Use Projection Queries
+
+Use `only` and `except` parameters to limit response size:
+
+**REST - Only Specific Fields:**
+
+```http
+GET /v3/content_types/blog_post/entries?only[BASE][]=title&only[BASE][]=url&only[BASE][]=published_date
+```
+
+**REST - Exclude Fields:**
+
+```http
+GET /v3/content_types/blog_post/entries?except[BASE][]=internal_notes&except[BASE][]=draft_content
+```
+
+**GraphQL - Query Only Needed Fields:**
+
 ```graphql
 query {
   allContentstackBlogPost {
     nodes {
       title
       url
+      published_date
+      # Only request fields you actually use
     }
   }
 }
 ```
 
-### 3. Implement Caching
-
-- Cache responses when appropriate
-- Use CDN caching for delivery API
-- Implement client-side caching for better performance
-
-### 4. Handle Pagination
+### 5. Implement Pagination
 
 Always implement pagination for large datasets:
 
+**REST:**
+
+```http
+GET /v3/content_types/blog_post/entries?skip=0&limit=10&include_count=true
+```
+
+**GraphQL:**
+
 ```graphql
-query($skip: Int!, $limit: Int!) {
+query ($skip: Int!, $limit: Int!) {
   allContentstackBlogPost(skip: $skip, limit: $limit) {
-    nodes { title }
+    nodes {
+      title
+    }
     total
   }
 }
 ```
 
-### 5. Error Handling
+**Best Practices:**
+
+- Use reasonable page sizes (10-50 items)
+- Always include total count for pagination UI
+- Implement infinite scroll or page-based navigation
+
+### 6. Avoid Deep Reference Nesting
+
+**Avoid:**
+
+```http
+GET /v3/content_types/blog_post/entries/entry_uid?include[]=author.company.employees.department.manager
+```
+
+**Prefer:**
+
+```http
+GET /v3/content_types/blog_post/entries/entry_uid?include[]=author
+```
+
+Then fetch nested references separately if needed.
+
+### 7. Use Modular Blocks Instead of Multiple References
+
+When building pages with multiple content blocks, use **Modular Blocks** instead of multiple content type references:
+
+**Why Modular Blocks:**
+
+- Reduces number of includes needed
+- All blocks fetched in single call
+- More efficient than multiple references
+- Better performance
+
+**Example Structure:**
+
+```typescript
+// Content Type: Page
+// Field: blocks (Modular Block)
+// Blocks: HeroBlock, ContentBlock, CTABlock, GalleryBlock
+
+// Single call fetches all blocks
+const page = await stack.contentType("page").entry("page_uid").fetch();
+// All blocks are included automatically, no includes needed
+```
+
+### 8. Implement Caching Strategy
+
+**CDN Caching:**
+
+- Contentstack automatically caches API responses via CDN
+- Cache is invalidated when content is published
+- Leverage CDN for better performance
+
+**Application-Level Caching:**
+
+```typescript
+// Cache frequently-used data
+const cache = new Map();
+
+async function getCachedEntry(uid: string) {
+  const cacheKey = `entry_${uid}`;
+
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
+  const entry = await stack.contentType("blog_post").entry(uid).fetch();
+  cache.set(cacheKey, entry);
+
+  // Set TTL (time to live)
+  setTimeout(() => cache.delete(cacheKey), 3600000); // 1 hour
+
+  return entry;
+}
+```
+
+**Cache Frequently-Used Data:**
+
+- User groups, titles, metadata
+- FAQ sections
+- Navigation menus
+- Content that doesn't change often
+
+### 9. Implement Lazy Loading
+
+Load content progressively instead of all at once:
+
+**Example - Lazy Load Sections:**
+
+```typescript
+// Load critical content first
+const hero = await fetchHero();
+const mainContent = await fetchMainContent();
+
+// Load secondary content later
+setTimeout(async () => {
+  const sidebar = await fetchSidebar();
+  const footer = await fetchFooter();
+}, 100);
+```
+
+**Framework-Specific:**
+
+- **React**: Use `React.lazy()` and `Suspense`
+- **Vue**: Use dynamic imports
+- **Next.js**: Use dynamic imports with `ssr: false`
+
+### 10. Optimize Your Code
+
+**Eliminate Redundancies:**
+
+- Remove duplicate API calls
+- Check if data is already fetched before requesting
+- Avoid making queries unique with random numbers/timestamps
+- Cache responses in your application
+
+**Example - Avoid Duplicate Calls:**
+
+```typescript
+// BAD: Fetches same data multiple times
+function renderPage() {
+  const entry = await fetchEntry(uid);
+  const author = await fetchAuthor(entry.author_uid);
+  const entry2 = await fetchEntry(uid); // Duplicate!
+}
+
+// GOOD: Fetch once, reuse
+function renderPage() {
+  const entry = await fetchEntry(uid);
+  const author = await fetchAuthor(entry.author_uid);
+  // Reuse entry object
+}
+```
+
+### 11. Error Handling
 
 Always handle API errors gracefully:
 
@@ -531,15 +751,20 @@ try {
   const response = await fetch(apiUrl, options);
   if (!response.ok) {
     const error = await response.json();
-    // Handle error
+    // Handle error appropriately
+    console.error("API Error:", error.error_message);
+    return null;
   }
   const data = await response.json();
+  return data;
 } catch (error) {
   // Handle network error
+  console.error("Network Error:", error);
+  return null;
 }
 ```
 
-### 6. Use SDK When Possible
+### 12. Use SDK When Possible
 
 Prefer using the official SDK (`@contentstack/delivery-sdk`) over direct API calls:
 
@@ -548,6 +773,57 @@ Prefer using the official SDK (`@contentstack/delivery-sdk`) over direct API cal
 - Easier authentication
 - Query builder helpers
 - Live Preview support
+- Automatic request optimization
+
+### 13. Batch Operations When Needed
+
+If you need multiple includes that exceed limits, batch them:
+
+```typescript
+// Split includes into batches
+async function fetchEntryWithBatchedIncludes(uid: string) {
+  // Batch 1: Core references
+  const entry = await stack
+    .contentType("blog_post")
+    .entry(uid)
+    .includeReference(["author", "category"])
+    .only(["title", "url", "author", "category"])
+    .fetch();
+
+  // Batch 2: Additional references
+  const tags = await stack
+    .contentType("tag")
+    .entry()
+    .query()
+    .where("entries", QueryOperation.IN, [uid])
+    .find();
+
+  // Merge results
+  return { ...entry, tags: tags.entries };
+}
+```
+
+### 14. Monitor API Usage
+
+- Check rate limit headers in responses
+- Implement retry logic with exponential backoff
+- Monitor response times and payload sizes
+- Set up alerts for API errors
+
+### Summary Checklist
+
+When making API calls, ensure:
+
+- ✅ Response payload < 5 MB
+- ✅ Total includes ≤ 10
+- ✅ Using projection queries (`only`/`except`)
+- ✅ Implementing pagination
+- ✅ Avoiding deep reference nesting
+- ✅ Caching frequently-used data
+- ✅ Using lazy loading for non-critical content
+- ✅ Eliminating duplicate calls
+- ✅ Handling errors gracefully
+- ✅ Using SDK when possible
 
 ## Regional Considerations
 
@@ -560,6 +836,4 @@ Always specify the correct region in your API calls:
 ## Next Steps
 
 - Learn about [SDK Functionalities](02-sdk-functionalities.md)
-- Learn about [Live Preview Setup](03-live-preview-base-concepts.md)
-- Learn about [Personalization Setup](04-personalization-setup.md)
-
+- Learn about [Live Preview Guide](03-live-preview-guide.md)
