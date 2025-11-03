@@ -37,7 +37,7 @@ The following steps apply to all frameworks and rendering modes:
 
 - THIS IS VERY IMPORTANT: ALWAYS USE THE TYPESCRIPT DELIVERY SDK (`@contentstack/delivery-sdk`) WHEN YOU QUERY CONTENTSTACK!
 
-2. **Configure the SDK** - always include a `live_preview` configuration when creating the SDK instance. Set `enable: true`, pass your `preview_token` and specify the correct `host` (see [Region Hosts](#region-hosts)).
+2. **Configure the SDK** - always include a `live_preview` configuration when creating the SDK instance. Set `enable: true`, pass your `preview_token` and specify the correct `host` (see [Region Hosts](#10-region-hosts)).
 3. **Initialise the Live Preview Utils SDK**. Call `ContentstackLivePreview.init()` once on the client side. Specify whether you are using SSR (`ssr: true`) or CSR (`ssr: false`), and provide:
    - `stackDetails`: object with `apiKey`, `environment` and optional `branch`.
    - `stackSdk`: reference to your Contentstack SDK instance (for Gatsby use `ContentstackGatsby.stackSdk`).
@@ -448,10 +448,190 @@ If you built Live Preview using the old Content Management API (CMA), switch to 
 2. **Replace the management token with your preview token**.
 3. **When a preview hash is present**, include it as the `live_preview` header and set `preview_token` in the headers. Only switch the host to the preview host when the hash exists; otherwise use the normal CDN host.
 
-## 12. Additional Notes
+## 12. Framework-Specific Patterns
+
+The patterns below apply to any framework. The key difference is CSR (real-time updates) vs SSR (page refresh).
+
+### Next.js App Directory (CSR)
+
+```typescript
+// lib/contentstack.ts
+import contentstack from "@contentstack/delivery-sdk";
+import ContentstackLivePreview, {
+  IStackSdk,
+} from "@contentstack/live-preview-utils";
+
+export const stack = contentstack.stack({
+  apiKey: process.env.NEXT_PUBLIC_CONTENTSTACK_API_KEY!,
+  deliveryToken: process.env.NEXT_PUBLIC_CONTENTSTACK_DELIVERY_TOKEN!,
+  environment: process.env.NEXT_PUBLIC_CONTENTSTACK_ENVIRONMENT!,
+  region: "us",
+  live_preview: {
+    enable: true,
+    preview_token: process.env.NEXT_PUBLIC_CONTENTSTACK_PREVIEW_TOKEN,
+    host: "rest-preview.contentstack.com",
+  },
+});
+
+export function initLivePreview() {
+  ContentstackLivePreview.init({
+    ssr: false, // CSR mode
+    enable: true,
+    stackSdk: stack.config as IStackSdk,
+    stackDetails: {
+      apiKey: process.env.NEXT_PUBLIC_CONTENTSTACK_API_KEY!,
+      environment: process.env.NEXT_PUBLIC_CONTENTSTACK_ENVIRONMENT!,
+    },
+    editButton: { enable: true },
+  });
+}
+```
+
+```typescript
+// app/page.tsx
+"use client";
+import { useEffect, useState } from "react";
+import contentstack from "@contentstack/delivery-sdk";
+import ContentstackLivePreview from "@contentstack/live-preview-utils";
+import { stack, initLivePreview } from "@/lib/contentstack";
+
+export default function Page() {
+  const [entry, setEntry] = useState(null);
+
+  useEffect(() => {
+    initLivePreview();
+
+    const fetchData = async () => {
+      const result = await stack.contentType("page").entry("entry_uid").fetch();
+      contentstack.Utils.addEditableTags(result, "page", true);
+      setEntry(result);
+    };
+
+    ContentstackLivePreview.onEntryChange(fetchData);
+    fetchData();
+  }, []);
+
+  return entry && <h1 {...(entry?.$ && entry?.$.title)}>{entry.title}</h1>;
+}
+```
+
+### Next.js App Directory (SSR)
+
+```typescript
+// app/page.tsx (Server Component)
+import contentstack from "@contentstack/delivery-sdk";
+import { stack } from "@/lib/contentstack";
+
+export default async function Page({ searchParams }) {
+  const { live_preview, entry_uid, content_type_uid } = await searchParams;
+
+  if (live_preview) {
+    stack.livePreviewQuery({
+      live_preview: live_preview as string,
+      contentTypeUid: content_type_uid as string,
+      entryUid: entry_uid as string,
+    });
+  }
+
+  const entry = await stack.contentType("page").entry("entry_uid").fetch();
+  contentstack.Utils.addEditableTags(entry, "page", true);
+
+  return <h1 {...(entry?.$ && entry?.$.title)}>{entry.title}</h1>;
+}
+```
+
+```typescript
+// app/layout.tsx - Initialize SDK on client
+"use client";
+import { useEffect } from "react";
+import { initLivePreview } from "@/lib/contentstack";
+
+export default function Layout({ children }) {
+  useEffect(() => {
+    initLivePreview(); // Use ssr: true for SSR mode
+  }, []);
+
+  return <>{children}</>;
+}
+```
+
+### Nuxt 4 (CSR)
+
+```typescript
+// plugins/contentstack.ts
+import contentstack from "@contentstack/delivery-sdk";
+import ContentstackLivePreview, {
+  type IStackSdk,
+} from "@contentstack/live-preview-utils";
+
+export default defineNuxtPlugin((nuxtApp) => {
+  const stack = contentstack.stack({
+    apiKey: process.env.NUXT_CONTENTSTACK_API_KEY!,
+    deliveryToken: process.env.NUXT_CONTENTSTACK_DELIVERY_TOKEN!,
+    environment: process.env.NUXT_CONTENTSTACK_ENVIRONMENT!,
+    region: "us",
+    live_preview: {
+      enable: true,
+      preview_token: process.env.NUXT_CONTENTSTACK_PREVIEW_TOKEN,
+      host: "rest-preview.contentstack.com",
+    },
+  });
+
+  if (import.meta.client) {
+    ContentstackLivePreview.init({
+      ssr: false, // CSR mode
+      enable: true,
+      stackSdk: stack.config as IStackSdk,
+      stackDetails: {
+        apiKey: process.env.NUXT_CONTENTSTACK_API_KEY!,
+        environment: process.env.NUXT_CONTENTSTACK_ENVIRONMENT!,
+      },
+    });
+  }
+
+  return { provide: { stack } };
+});
+```
+
+```vue
+<!-- app.vue -->
+<script setup>
+import contentstack from "@contentstack/delivery-sdk";
+
+const { data: page, refresh } = await useAsyncData("page", async () => {
+  const { $stack } = useNuxtApp();
+  const route = useRoute();
+
+  if (route.query.live_preview) {
+    $stack.livePreviewQuery(route.query);
+  }
+
+  const entry = await $stack.contentType("page").entry("entry_uid").fetch();
+  contentstack.Utils.addEditableTags(entry, "page", true);
+  return entry;
+});
+
+onMounted(() => {
+  const { $ContentstackLivePreview } = useNuxtApp();
+  $ContentstackLivePreview.onEntryChange(refresh);
+});
+</script>
+
+<template>
+  <h1 v-if="page?.title" v-bind="page?.$ && page?.$.title">
+    {{ page.title }}
+  </h1>
+</template>
+```
+
+### Nuxt 4 (SSR)
+
+For SSR, use the same plugin but set `ssr: true` and remove the `onMounted` refresh handler. The page will automatically refresh when content changes.
+
+## 13. Additional Notes
 
 - Always initialise the Live Preview Utils SDK on the **client side** (browser) for CSR and on **each request** for SSR.
 - Ensure your preview site uses **HTTPS** and allows iframe embedding.
 - The **Edit button** can be customised via the `editButton` object in the SDK configuration. You can disable it entirely or choose positions like `top`, `top-right`, `bottom-left`, etc.
 - Avoid caching preview responses—fetch fresh data for each update.
-- For frameworks not covered here (Vue, Angular, Nuxt, Next, etc.), follow the same patterns: generate the preview token, configure your SDK with `live_preview`, initialise the Live Preview Utils SDK, detect the hash, and refetch data on change.
+- For other frameworks (Vue, Angular, Svelte, etc.), follow the same patterns: configure SDK with `live_preview`, initialise the Live Preview Utils SDK, detect the hash, and refetch data on change (CSR) or let page refresh (SSR).
