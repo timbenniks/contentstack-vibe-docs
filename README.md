@@ -145,6 +145,7 @@ All documentation files are located in `.contentstack-vibe-docs/`:
 - `01-api-functionalities.md` - REST and GraphQL API usage
 - `02-sdk-functionalities.md` - JavaScript/TypeScript SDK patterns
 - `03-live-preview-guide.md` - Complete Live Preview implementation
+- `04-cli-plugin-creation.md` - CLI Plugin Creation Guide
 - `05-practical-examples.md` - Real-world code examples
 
 **File naming convention**: Files are numbered for recommended reading order. Missing numbers (e.g., `04-`) indicate removed or deprecated content.
