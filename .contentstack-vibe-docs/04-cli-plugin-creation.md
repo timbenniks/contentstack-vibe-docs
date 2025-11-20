@@ -1,6 +1,6 @@
-# Contentstack CLI Plugin Development Guide
+# Contentstack CLI Plugin Development Guide for AI Agents
 
-A comprehensive guide to developing external plugins for the Contentstack CLI, based on real-world implementation patterns and best practices.
+This guide covers developing external plugins for the Contentstack CLI, based on real-world implementation patterns and best practices. It is written for AI coding assistants to help implement CLI plugins quickly and accurately.
 
 ## Introduction
 
@@ -1287,6 +1287,13 @@ When contributing to Contentstack CLI plugins:
 3. Update documentation
 4. Ensure backward compatibility when possible
 5. Submit pull requests with clear descriptions
+
+## Next Steps
+
+- Review [Base Concepts](00-contentstack-base-concepts.md) to understand Contentstack fundamentals
+- Learn about [API Functionalities](01-api-functionalities.md) for Management API usage
+- Explore [SDK Functionalities](02-sdk-functionalities.md) for Delivery API patterns
+- Check [Practical Examples](05-practical-examples.md) for implementation patterns
 
 ---
 

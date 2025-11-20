@@ -103,6 +103,16 @@ Before implementing Contentstack features, gather this information:
 **Ask**: What filters? Single or multiple conditions?
 **Action**: Read `02-sdk-functionalities.md` Query Building section, check `QueryOperation` examples
 
+#### Scenario: "I want to create a CLI plugin"
+
+**Ask**: What functionality? Do you have Management API access? What's the use case?
+**Action**: Read `04-cli-plugin-creation.md` completely, understand oclif framework, check reference plugins
+
+#### Scenario: "I want to build a Developer Hub app"
+
+**Ask**: What UI location? What's the app purpose? Do you need OAuth?
+**Action**: Read `06-devhub.md` completely, understand App SDK, check UI location requirements
+
 ### Best Practices for Agents
 
 1. **Always Use TypeScript Types**: Import `Entry` and create proper interfaces
@@ -145,10 +155,11 @@ All documentation files are located in `.contentstack-vibe-docs/`:
 - `01-api-functionalities.md` - REST and GraphQL API usage
 - `02-sdk-functionalities.md` - JavaScript/TypeScript SDK patterns
 - `03-live-preview-guide.md` - Complete Live Preview implementation
-- `04-cli-plugin-creation.md` - CLI Plugin Creation Guide
+- `04-cli-plugin-creation.md` - CLI Plugin Development Guide
 - `05-practical-examples.md` - Real-world code examples
+- `06-devhub.md` - Developer Hub & Custom Apps Guide
 
-**File naming convention**: Files are numbered for recommended reading order. Missing numbers (e.g., `04-`) indicate removed or deprecated content.
+**File naming convention**: Files are numbered for recommended reading order. Files cover core concepts (00-02), feature guides (03-05), and advanced topics (06+).
 
 ## Documentation Structure
 
@@ -161,7 +172,12 @@ All documentation files are located in `.contentstack-vibe-docs/`:
 ### Feature Guides
 
 - **[Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md)** - Complete Live Preview guide covering concepts, setup, CSR/SSR modes, and framework-specific patterns (Next.js, Nuxt 4, Gatsby)
+- **[CLI Plugin Creation](.contentstack-vibe-docs/04-cli-plugin-creation.md)** - Guide for developing external plugins for Contentstack CLI using oclif framework
 - **[Practical Examples](.contentstack-vibe-docs/05-practical-examples.md)** - Real-world implementation examples for rendering content, references, modular blocks, asset transformations, and common patterns
+
+### Advanced Topics
+
+- **[Developer Hub & Custom Apps](.contentstack-vibe-docs/06-devhub.md)** - Guide for building custom apps and extensions for Contentstack Developer Hub using React, TypeScript, and App SDK
 
 ## Key Features
 
@@ -179,6 +195,8 @@ All documentation files are located in `.contentstack-vibe-docs/`:
 - **API Functionalities** - REST API, GraphQL API, authentication, querying
 - **SDK Functionalities** - Delivery SDK usage, query building, error handling
 - **Live Preview** - Setup, configuration, CSR/SSR modes, framework patterns
+- **CLI Plugins** - Developing custom CLI plugins for Contentstack
+- **Developer Hub Apps** - Building custom apps and extensions for Contentstack
 
 ### Framework Support
 
@@ -218,6 +236,11 @@ All Contentstack regions are supported:
 4. **Add Live Preview**: Follow [Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md) - Complete setup and implementation for all frameworks
 5. **See Examples**: Reference [Practical Examples](.contentstack-vibe-docs/05-practical-examples.md) - Real-world code patterns for rendering content
 
+**For advanced topics:**
+
+- **CLI Plugins**: See [CLI Plugin Creation](.contentstack-vibe-docs/04-cli-plugin-creation.md) for extending Contentstack CLI
+- **Custom Apps**: See [Developer Hub Guide](.contentstack-vibe-docs/06-devhub.md) for building Developer Hub apps
+
 ### For Existing Projects
 
 1. **Review Live Preview**: Read the [Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md)
@@ -246,6 +269,14 @@ All Contentstack regions are supported:
 ### I need practical examples
 
 → See [Practical Examples](.contentstack-vibe-docs/05-practical-examples.md) for rendering patterns, references, modular blocks, and common use cases
+
+### I want to create a CLI plugin
+
+→ Follow [CLI Plugin Creation Guide](.contentstack-vibe-docs/04-cli-plugin-creation.md) for developing custom CLI plugins
+
+### I want to build a Developer Hub app
+
+→ Follow [Developer Hub Guide](.contentstack-vibe-docs/06-devhub.md) for building custom apps and extensions
 
 ### I'm building with Next.js
 
