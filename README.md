@@ -1,325 +1,199 @@
 # Contentstack Vibe Coding Documentation for AI Agents
 
-This repository contains comprehensive documentation for building applications with Contentstack CMS. The guides are specifically written for AI coding assistants to help them implement Contentstack features quickly and accurately.
+Comprehensive documentation for building applications with Contentstack CMS. Specifically optimized for AI coding assistants to implement Contentstack features quickly and accurately.
+
+## Quick Start
+
+| I want to...                       | Read this                                                                    |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| **Quickly look up a pattern**      | [QUICK_REFERENCE.md](.contentstack-vibe-docs/QUICK_REFERENCE.md)             |
+| **Check package versions**         | [VERSIONS.md](.contentstack-vibe-docs/VERSIONS.md)                           |
+| **Understand Contentstack basics** | [Base Concepts](.contentstack-vibe-docs/concepts/base-concepts.md)           |
+| **Configure regions**              | [Regions Guide](.contentstack-vibe-docs/concepts/regions.md)                 |
+| **Use the REST API**               | [REST API](.contentstack-vibe-docs/api/rest-api.md)                          |
+| **Use GraphQL**                    | [GraphQL API](.contentstack-vibe-docs/api/graphql-api.md)                    |
+| **Use the TypeScript SDK**         | [Delivery SDK](.contentstack-vibe-docs/sdk/delivery-sdk.md)                  |
+| **Implement Live Preview**         | [Live Preview Concepts](.contentstack-vibe-docs/live-preview/concepts.md)    |
+| **Build with Next.js**             | [Next.js Patterns](.contentstack-vibe-docs/frameworks/nextjs.md)             |
+| **Build with Nuxt**                | [Nuxt Patterns](.contentstack-vibe-docs/frameworks/nuxt.md)                  |
+| **Build with Gatsby**              | [Gatsby Patterns](.contentstack-vibe-docs/frameworks/gatsby.md)              |
+| **Create a CLI plugin**            | [CLI Plugins](.contentstack-vibe-docs/extensions/cli-plugins.md)             |
+| **Build a Developer Hub app**      | [DevHub Apps](.contentstack-vibe-docs/extensions/devhub-apps.md)             |
+| **See code examples**              | [Practical Examples](.contentstack-vibe-docs/examples/practical-examples.md) |
+
+---
 
 ## Agent Instructions
 
-When helping developers implement Contentstack features, follow these guidelines:
-
-### How to Use This Documentation
-
-1. **Start with Context**: Always read the relevant documentation file before implementing. Don't assume - verify patterns match the latest SDK/API versions.
-2. **Follow the Numbered Order**: Files are numbered (`00-`, `01-`, etc.) for a reason. Read prerequisites before advanced topics.
-3. **Reference Practical Examples**: When writing code, check `05-practical-examples.md` for real-world patterns that match the developer's framework.
-4. **Verify Against Multiple Sources**: Cross-reference patterns between SDK docs, API docs, and examples to ensure consistency.
-
-### Questions to Ask Developers
-
-Before implementing Contentstack features, gather this information:
+### Questions to Ask Developers First
 
 #### Basic Setup
 
-- **What is the Contentstack region?** (US, EU, AU, Azure, GCP) - Required for correct endpoints
-- **Do you have API credentials?** (API Key, Delivery Token, Preview Token if needed)
-- **What environment are you using?** (production, staging, preview, development)
-- **Is this a new project or existing project?** - Determines setup approach
+- **What Contentstack region?** (US, EU, AU, Azure, GCP) - Required for endpoints
+- **Do you have credentials?** (API Key, Delivery Token, Preview Token)
+- **What environment?** (production, staging, preview)
 
 #### Framework & Architecture
 
-- **What framework are you using?** (Next.js, Nuxt, Gatsby, React, Vue, etc.)
-- **Are you using SSR or CSR?** - Critical for Live Preview implementation
-- **Do you have a routing setup?** - Needed for Live Preview URL handling
-- **What's your hosting setup?** (Vercel, Netlify, self-hosted) - Affects Live Preview configuration
+- **What framework?** (Next.js, Nuxt, Gatsby, React, Vue)
+- **Does your site fetch data client-side or server-side?** - Determines Live Preview SDK mode
+- **What's the hosting?** (Vercel, Netlify, self-hosted)
 
 #### Content Requirements
 
-- **What content types do you need?** - Helps understand query patterns
-- **Do you need references included?** - Determines `.includeReference()` usage
-- **Are you using modular blocks?** - Affects rendering patterns
-- **Do you need multiple locales?** - Requires locale handling
-- **Do you need image transformations?** - Asset handling patterns
-
-#### Live Preview (if applicable)
-
-- **Do you need Live Preview?** - Yes/No determines setup complexity
-- **Is your site publicly accessible via HTTPS?** - Required for Live Preview
-- **Do you have a Preview Token?** - Required for Live Preview
-- **Is Live Preview enabled in Contentstack?** - Must be configured in CMS
+- **What content types?** - Query patterns
+- **Need references included?** - `.includeReference()` usage
+- **Using modular blocks?** - Rendering patterns
+- **Multiple locales?** - Locale handling
+- **Need image transforms?** - Asset handling
 
 ### Decision Trees
 
-#### Choosing API vs SDK
+#### API vs SDK
 
-- **Use SDK** (`@contentstack/delivery-sdk`) when:
-  - Building with JavaScript/TypeScript
-  - Need type safety
-  - Want built-in error handling
-  - Need Live Preview support
-- **Use REST/GraphQL API directly** when:
-  - Using non-JavaScript languages
-  - Need fine-grained control
-  - Building custom integrations
+- **Use SDK** when: JavaScript/TypeScript, need type safety, need Live Preview
+- **Use REST/GraphQL directly** when: Non-JS languages, fine-grained control
 
-#### Choosing CSR vs SSR for Live Preview
+#### Live Preview SDK Mode (`ssr` setting)
 
-- **Use CSR** (`ssr: false`) when:
-  - Client-side rendered application (React SPA, Vue SPA)
-  - Want instant updates without page refresh
-  - Using client-side routing
-- **Use SSR** (`ssr: true`) when:
-  - Server-side rendered application (Next.js SSR, Nuxt SSR)
-  - Need SEO benefits
-  - Using server-side routing
+**Important**: This setting controls how the preview updates inside the CMS iframe - NOT your website's rendering strategy. Live Preview is never enabled in production.
+
+- **`ssr: false`**: Uses postMessage. CMS sends data changes to iframe, client JS re-fetches and updates UI instantly (no page refresh)
+- **`ssr: true`**: CMS refreshes the iframe with query params (`?live_preview=hash&entry_uid=...`). Server reads params and fetches preview data
 
 ### Implementation Workflow
 
-1. **Gather Requirements** - Ask the questions above
-2. **Read Relevant Docs** - Start with Base Concepts if new, then SDK/API docs
-3. **Check Examples** - Find matching patterns in Practical Examples
-4. **Implement Step-by-Step** - Follow documentation patterns exactly
-5. **Add Error Handling** - Always include try-catch and proper error messages
-6. **Use Environment Variables** - Never hardcode credentials
-7. **Test Thoroughly** - Verify with actual Contentstack stack
+1. **Gather requirements** - Ask questions above
+2. **Read relevant docs** - Start with concepts if new
+3. **Check examples** - Find matching patterns
+4. **Implement step-by-step** - Follow patterns exactly
+5. **Add error handling** - Always try-catch
+6. **Use environment variables** - Never hardcode
+7. **Test thoroughly** - Verify with real stack
 
-### Common Scenarios
+### Red Flags ⚠️
 
-#### Scenario: "I need to fetch content from Contentstack"
+**Never do these:**
 
-**Ask**: What framework? Do you have credentials? What content type?
-**Action**: Read `02-sdk-functionalities.md`, check `05-practical-examples.md` for framework-specific patterns
-
-#### Scenario: "I want to add Live Preview"
-
-**Ask**: CSR or SSR? Is site HTTPS? Do you have Preview Token?
-**Action**: Read `03-live-preview-guide.md` completely, find framework pattern in Section 12
-
-#### Scenario: "I'm getting errors"
-
-**Ask**: What's the error message? What SDK version? What region?
-**Action**: Check troubleshooting sections in relevant docs, verify credentials, check region endpoints
-
-#### Scenario: "I need to query with filters"
-
-**Ask**: What filters? Single or multiple conditions?
-**Action**: Read `02-sdk-functionalities.md` Query Building section, check `QueryOperation` examples
-
-#### Scenario: "I want to create a CLI plugin"
-
-**Ask**: What functionality? Do you have Management API access? What's the use case?
-**Action**: Read `04-cli-plugin-creation.md` completely, understand oclif framework, check reference plugins
-
-#### Scenario: "I want to build a Developer Hub app"
-
-**Ask**: What UI location? What's the app purpose? Do you need OAuth?
-**Action**: Read `06-devhub.md` completely, understand App SDK, check UI location requirements
-
-### Best Practices for Agents
-
-1. **Always Use TypeScript Types**: Import `Entry` and create proper interfaces
-2. **Always Initialize Stack Properly**: Use environment variables, never hardcode
-3. **Always Include Error Handling**: Wrap API calls in try-catch blocks
-4. **Always Use `.includeReference()`**: When references are needed, explicitly include them
-5. **Always Verify Credentials**: Remind developers to check API keys and tokens
-6. **Always Check Region**: Verify correct region endpoints are used
-7. **Always Follow Framework Patterns**: Match the developer's framework exactly
-8. **Always Add Comments**: Explain Contentstack-specific code patterns
-
-### Red Flags to Watch For
-
-⚠️ **Never do these:**
-
-- Hardcode API keys or tokens in code
-- Use Management Tokens in frontend code
+- Hardcode API keys or tokens
+- Use Management Tokens in frontend
 - Skip error handling
-- Assume SDK versions (check package.json)
 - Mix REST and GraphQL patterns incorrectly
 - Forget to include references when needed
-- Ignore region configuration
-- Skip HTTPS requirement for Live Preview
 
-### When to Ask for Help
-
-Ask the developer for clarification when:
-
-- Credentials are missing or unclear
-- Framework/architecture is ambiguous
-- Error messages are unclear
-- Requirements conflict with documentation
-- Custom setups deviate from standard patterns
-
-## Quick Reference
-
-All documentation files are located in `.contentstack-vibe-docs/`:
-
-- `00-contentstack-base-concepts.md` - Start here for fundamentals
-- `01-api-functionalities.md` - REST and GraphQL API usage
-- `02-sdk-functionalities.md` - JavaScript/TypeScript SDK patterns
-- `03-live-preview-guide.md` - Complete Live Preview implementation
-- `04-cli-plugin-creation.md` - CLI Plugin Development Guide
-- `05-practical-examples.md` - Real-world code examples
-- `06-devhub.md` - Developer Hub & Custom Apps Guide
-
-**File naming convention**: Files are numbered for recommended reading order. Files cover core concepts (00-02), feature guides (03-05), and advanced topics (06+).
+---
 
 ## Documentation Structure
 
-### Core Concepts
+```
+.contentstack-vibe-docs/
+├── QUICK_REFERENCE.md      # Condensed patterns for quick lookup
+├── VERSIONS.md             # Package version compatibility
+├── concepts/
+│   ├── base-concepts.md    # CMS fundamentals
+│   └── regions.md          # Region configuration guide
+├── api/
+│   ├── rest-api.md         # REST API usage
+│   └── graphql-api.md      # GraphQL API usage
+├── sdk/
+│   └── delivery-sdk.md     # TypeScript SDK guide
+├── live-preview/
+│   ├── concepts.md         # Live Preview overview
+│   ├── csr-mode.md         # ssr:false - postMessage updates
+│   └── ssr-mode.md         # ssr:true - iframe refresh with query params
+├── frameworks/
+│   ├── nextjs.md           # Next.js patterns
+│   ├── nuxt.md             # Nuxt 4 patterns
+│   └── gatsby.md           # Gatsby patterns
+├── extensions/
+│   ├── cli-plugins.md      # CLI plugin development
+│   └── devhub-apps.md      # Developer Hub apps
+└── examples/
+    └── practical-examples.md  # Real-world code patterns
+```
 
-- **[Base Concepts](.contentstack-vibe-docs/00-contentstack-base-concepts.md)** - Fundamental CMS concepts, terminology, and architecture
-- **[API Functionalities](.contentstack-vibe-docs/01-api-functionalities.md)** - REST API and GraphQL API usage, endpoints, and patterns
-- **[SDK Functionalities](.contentstack-vibe-docs/02-sdk-functionalities.md)** - JavaScript/TypeScript SDK usage, querying, and best practices
+---
 
-### Feature Guides
+## Reading Order
 
-- **[Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md)** - Complete Live Preview guide covering concepts, setup, CSR/SSR modes, and framework-specific patterns (Next.js, Nuxt 4, Gatsby)
-- **[CLI Plugin Creation](.contentstack-vibe-docs/04-cli-plugin-creation.md)** - Guide for developing external plugins for Contentstack CLI using oclif framework
-- **[Practical Examples](.contentstack-vibe-docs/05-practical-examples.md)** - Real-world implementation examples for rendering content, references, modular blocks, asset transformations, and common patterns
+### For New Projects
 
-### Advanced Topics
+1. [Base Concepts](.contentstack-vibe-docs/concepts/base-concepts.md) - Understand the CMS
+2. [Delivery SDK](.contentstack-vibe-docs/sdk/delivery-sdk.md) - Set up SDK
+3. Framework guide ([Next.js](.contentstack-vibe-docs/frameworks/nextjs.md), [Nuxt](.contentstack-vibe-docs/frameworks/nuxt.md), or [Gatsby](.contentstack-vibe-docs/frameworks/gatsby.md))
+4. [Live Preview Concepts](.contentstack-vibe-docs/live-preview/concepts.md) - If needed
+5. [Practical Examples](.contentstack-vibe-docs/examples/practical-examples.md) - Reference patterns
 
-- **[Developer Hub & Custom Apps](.contentstack-vibe-docs/06-devhub.md)** - Guide for building custom apps and extensions for Contentstack Developer Hub using React, TypeScript, and App SDK
+### For Existing Projects
+
+1. [QUICK_REFERENCE.md](.contentstack-vibe-docs/QUICK_REFERENCE.md) - Quick patterns
+2. Specific feature docs as needed
+
+### For Extensions
+
+- CLI plugins: [CLI Plugins Guide](.contentstack-vibe-docs/extensions/cli-plugins.md)
+- DevHub apps: [DevHub Apps Guide](.contentstack-vibe-docs/extensions/devhub-apps.md)
+
+---
 
 ## Key Features
 
 ### AI Agent Optimized
 
-- **Step-by-step instructions** with clear implementation patterns
-- **Critical requirements** highlighted throughout
-- **Troubleshooting sections** with debug checklists
-- **Copy-paste ready code** examples with proper error handling
-- **TypeScript support** with type-safe examples
+- **Modular files** - Each topic in focused document
+- **Quick reference** - Condensed patterns for common tasks
+- **Version info** - Package compatibility documented
+- **Framework patterns** - Specific guides for Next.js, Nuxt, Gatsby
+- **Copy-paste ready** - All code examples work as-is
 
 ### Comprehensive Coverage
 
-- **CMS Base Concepts** - Stack, Content Types, Entries, Environments, Locales
-- **API Functionalities** - REST API, GraphQL API, authentication, querying
-- **SDK Functionalities** - Delivery SDK usage, query building, error handling
-- **Live Preview** - Setup, configuration, CSR/SSR modes, framework patterns
-- **CLI Plugins** - Developing custom CLI plugins for Contentstack
-- **Developer Hub Apps** - Building custom apps and extensions for Contentstack
-
-### Framework Support
-
-The Live Preview implementation guide includes patterns for:
-
-- **Next.js App Directory** (CSR and SSR modes)
-- **Nuxt 4** (CSR and SSR modes)
-- **Gatsby** (with Contentstack plugin)
-- **Universal patterns** applicable to other frameworks (React, Vue, Express, etc.)
-
-### Integration Options
-
-- **[@contentstack/delivery-sdk](https://www.npmjs.com/package/@contentstack/delivery-sdk)** - Official TypeScript Delivery SDK
-- **[@contentstack/live-preview-utils](https://www.npmjs.com/package/@contentstack/live-preview-utils)** - Live Preview utilities
-- **[@timbenniks/contentstack-endpoints](https://www.npmjs.com/package/@timbenniks/contentstack-endpoints)** - Recommended package for endpoint management
-- **Manual endpoint configuration** - Alternative approach for custom setups
+- CMS concepts and terminology
+- REST and GraphQL APIs
+- TypeScript Delivery SDK
+- Live Preview (CSR and SSR)
+- Framework-specific patterns
+- CLI plugin development
+- Developer Hub apps
 
 ### Region Support
 
-All Contentstack regions are supported:
+All regions supported: US, EU, AU, Azure NA/EU, GCP NA/EU
 
-- **US** (North America - AWS)
-- **EU** (Europe - AWS)
-- **AU** (Australia - AWS)
-- **Azure NA/EU** (Azure North America/Europe)
-- **GCP NA/EU** (GCP North America/Europe)
-
-## Quick Start
-
-### For New Projects
-
-**Recommended reading order:**
-
-1. **Understand the CMS**: Start with [Base Concepts](.contentstack-vibe-docs/00-contentstack-base-concepts.md) - Learn Stack, Content Types, Entries, Environments, Locales
-2. **Learn the APIs**: Review [API Functionalities](.contentstack-vibe-docs/01-api-functionalities.md) - REST and GraphQL endpoints, authentication, querying
-3. **Set up SDK**: Follow [SDK Functionalities](.contentstack-vibe-docs/02-sdk-functionalities.md) - JavaScript/TypeScript SDK usage, query building, error handling
-4. **Add Live Preview**: Follow [Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md) - Complete setup and implementation for all frameworks
-5. **See Examples**: Reference [Practical Examples](.contentstack-vibe-docs/05-practical-examples.md) - Real-world code patterns for rendering content
-
-**For advanced topics:**
-
-- **CLI Plugins**: See [CLI Plugin Creation](.contentstack-vibe-docs/04-cli-plugin-creation.md) for extending Contentstack CLI
-- **Custom Apps**: See [Developer Hub Guide](.contentstack-vibe-docs/06-devhub.md) for building Developer Hub apps
-
-### For Existing Projects
-
-1. **Review Live Preview**: Read the [Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md)
-2. **Choose rendering mode**: Decide between CSR (real-time updates) or SSR (page refresh)
-3. **Follow implementation patterns**: See framework-specific examples in the guide
-4. **Test integration**: Use the provided troubleshooting checklists to verify setup
-
-## Documentation by Use Case
-
-### I want to understand Contentstack basics
-
-→ Start with [Base Concepts](.contentstack-vibe-docs/00-contentstack-base-concepts.md)
-
-### I want to use Contentstack APIs directly
-
-→ Read [API Functionalities](.contentstack-vibe-docs/01-api-functionalities.md)
-
-### I want to use the Contentstack SDK
-
-→ Follow [SDK Functionalities](.contentstack-vibe-docs/02-sdk-functionalities.md)
-
-### I want to implement Live Preview
-
-→ Follow the [Live Preview Guide](.contentstack-vibe-docs/03-live-preview-guide.md)
-
-### I need practical examples
-
-→ See [Practical Examples](.contentstack-vibe-docs/05-practical-examples.md) for rendering patterns, references, modular blocks, and common use cases
-
-### I want to create a CLI plugin
-
-→ Follow [CLI Plugin Creation Guide](.contentstack-vibe-docs/04-cli-plugin-creation.md) for developing custom CLI plugins
-
-### I want to build a Developer Hub app
-
-→ Follow [Developer Hub Guide](.contentstack-vibe-docs/06-devhub.md) for building custom apps and extensions
-
-### I'm building with Next.js
-
-→ See framework patterns in [Live Preview Guide - Section 12](.contentstack-vibe-docs/03-live-preview-guide.md#12-framework-specific-patterns) for Next.js App Directory patterns (CSR and SSR)
-
-### I'm building with Nuxt 4
-
-→ See framework patterns in [Live Preview Guide - Section 12](.contentstack-vibe-docs/03-live-preview-guide.md#12-framework-specific-patterns) for Nuxt 4 patterns (CSR and SSR)
+---
 
 ## Best Practices
 
 ### Security
 
-- **Never expose Management Tokens** in frontend code
-- **Use Delivery Tokens** for public-facing applications
-- **Use Preview Tokens** only in preview/staging environments
-- **Store credentials** in environment variables, never hardcode
+- Never expose Management Tokens in frontend
+- Use Delivery Tokens for public apps
+- Use Preview Tokens only in preview environments
+- Store credentials in environment variables
 
 ### Performance
 
-- **Implement caching** for frequently accessed content
-- **Use CDN** for asset delivery
-- **Optimize queries** to fetch only needed fields
-- **Implement pagination** for large datasets
+- Implement caching for frequent content
+- Use CDN for assets
+- Optimize queries (fetch only needed fields)
+- Implement pagination for large datasets
 
 ### Code Quality
 
-- **Use TypeScript** for type safety
-- **Create reusable helper functions** for common operations
-- **Handle errors gracefully** with proper error handling
-- **Follow framework patterns** for consistency
+- Use TypeScript for type safety
+- Create reusable helper functions
+- Handle errors gracefully
+- Follow framework patterns
 
-## Contributing
-
-This documentation is maintained to help AI coding assistants implement Contentstack features effectively. Each guide focuses on practical implementation with minimal setup overhead.
+---
 
 ## Support
 
-For Contentstack-specific issues:
+- [Official Documentation](https://www.contentstack.com/docs)
+- [Discord Community](https://community.contentstack.com)
+- [Contentstack Support](https://www.contentstack.com/support)
 
-- Refer to the [official documentation](https://www.contentstack.com/docs)
-- Join the [Discord community](https://community.contentstack.com)
-- Check [Contentstack Support](https://www.contentstack.com/support)
+---
 
 ## License
 
