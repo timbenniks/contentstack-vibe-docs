@@ -33,8 +33,10 @@ npm install next-auth@5 @timbenniks/contentstack-endpoints
 
 **Critical implementation details:**
 
+- Authorization URL: `{appUrl}/apps/{APP_ID}/authorize` — NOT `#!/apps/...`
+- Token URL: `{appUrl}/apps-api/token`
+- Userinfo URL: `{apiUrl}/v3/user` — response is nested under `user` key
 - Use `checks: ["state"]` (or `["pkce", "state"]` for PKCE)
-- Userinfo response is nested: `response.user` not `response`
 - Always use `session: { strategy: "jwt" }`
 
 ---
@@ -394,6 +396,48 @@ export const config = {
 
 ---
 
+## URL Construction (Important!)
+
+The authorization URL format is **critical** and easy to get wrong.
+
+### Correct Format
+
+```
+Authorization: {appUrl}/apps/{APP_ID}/authorize
+Token:         {appUrl}/apps-api/token
+Userinfo:      {apiUrl}/v3/user
+```
+
+### Common Mistakes
+
+```
+❌ {appUrl}/#!/apps/{APP_ID}/authorize     # Hash routing doesn't work
+❌ {appUrl}/apps/authorize                  # Missing APP_ID
+❌ {appUrl}/apps/{CLIENT_ID}/authorize      # Wrong ID (use APP_ID, not CLIENT_ID)
+```
+
+### URL Resolution with @timbenniks/contentstack-endpoints
+
+```typescript
+import { getContentstackEndpoints } from "@timbenniks/contentstack-endpoints";
+
+const endpoints = getContentstackEndpoints("eu");
+
+// endpoints.application  → "https://eu-app.contentstack.com"
+// endpoints.contentManagement → "https://eu-api.contentstack.com"
+```
+
+### Full URL Examples (EU Region)
+
+| Endpoint      | URL                                                                       |
+| ------------- | ------------------------------------------------------------------------- |
+| Authorization | `https://eu-app.contentstack.com/apps/693970588f70cef8ad0a4578/authorize` |
+| Token         | `https://eu-app.contentstack.com/apps-api/token`                          |
+| Userinfo      | `https://eu-api.contentstack.com/v3/user`                                 |
+| Callback      | `http://localhost:3000/api/auth/callback/contentstack`                    |
+
+---
+
 ## Key Points
 
 | Aspect              | Detail                                                         |
@@ -443,4 +487,3 @@ interface ContentstackUser {
 - [Contentstack OAuth Documentation](https://www.contentstack.com/docs/developers/developer-hub/contentstack-oauth)
 - [Auth.js Documentation](https://authjs.dev)
 - [@timbenniks/contentstack-endpoints](https://www.npmjs.com/package/@timbenniks/contentstack-endpoints)
-
