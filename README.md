@@ -17,6 +17,7 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 | **Build with Next.js**             | [Next.js Patterns](.contentstack-vibe-docs/frameworks/nextjs.md)             |
 | **Build with Nuxt**                | [Nuxt Patterns](.contentstack-vibe-docs/frameworks/nuxt.md)                  |
 | **Build with Gatsby**              | [Gatsby Patterns](.contentstack-vibe-docs/frameworks/gatsby.md)              |
+| **Implement OAuth login**         | [OAuth with Auth.js](.contentstack-vibe-docs/authentication/oauth.md)         |
 | **Create a CLI plugin**            | [CLI Plugins](.contentstack-vibe-docs/extensions/cli-plugins.md)             |
 | **Build a Developer Hub app**      | [DevHub Apps](.contentstack-vibe-docs/extensions/devhub-apps.md)             |
 | **See code examples**              | [Practical Examples](.contentstack-vibe-docs/examples/practical-examples.md) |
@@ -46,6 +47,12 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 - **Using modular blocks?** - Rendering patterns
 - **Multiple locales?** - Locale handling
 - **Need image transforms?** - Asset handling
+
+#### Authentication
+
+- **Need user login?** - OAuth implementation with Contentstack
+- **What framework?** - OAuth guide available for Next.js with Auth.js
+- **Session storage?** - Cookie-based (JWT) or database-persisted
 
 ### Decision Trees
 
@@ -101,6 +108,8 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 │   ├── concepts.md         # Live Preview overview
 │   ├── csr-mode.md         # ssr:false - postMessage updates
 │   └── ssr-mode.md         # ssr:true - iframe refresh with query params
+├── authentication/
+│   └── oauth.md            # OAuth login with Auth.js (Next.js)
 ├── frameworks/
 │   ├── nextjs.md           # Next.js patterns
 │   ├── nuxt.md             # Nuxt 4 patterns
@@ -152,6 +161,7 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 - REST and GraphQL APIs
 - TypeScript Delivery SDK
 - Live Preview (CSR and SSR)
+- Authentication (OAuth with Auth.js)
 - Framework-specific patterns
 - CLI plugin development
 - Developer Hub apps
