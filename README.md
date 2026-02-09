@@ -6,21 +6,21 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 
 | I want to...                       | Read this                                                                    |
 | ---------------------------------- | ---------------------------------------------------------------------------- |
-| **Quickly look up a pattern**      | [QUICK_REFERENCE.md](.contentstack-vibe-docs/QUICK_REFERENCE.md)             |
-| **Check package versions**         | [VERSIONS.md](.contentstack-vibe-docs/VERSIONS.md)                           |
-| **Understand Contentstack basics** | [Base Concepts](.contentstack-vibe-docs/concepts/base-concepts.md)           |
-| **Configure regions**              | [Regions Guide](.contentstack-vibe-docs/concepts/regions.md)                 |
-| **Use the REST API**               | [REST API](.contentstack-vibe-docs/api/rest-api.md)                          |
-| **Use GraphQL**                    | [GraphQL API](.contentstack-vibe-docs/api/graphql-api.md)                    |
-| **Use the TypeScript SDK**         | [Delivery SDK](.contentstack-vibe-docs/sdk/delivery-sdk.md)                  |
-| **Implement Live Preview**         | [Live Preview Concepts](.contentstack-vibe-docs/live-preview/concepts.md)    |
-| **Build with Next.js**             | [Next.js Patterns](.contentstack-vibe-docs/frameworks/nextjs.md)             |
-| **Build with Nuxt**                | [Nuxt Patterns](.contentstack-vibe-docs/frameworks/nuxt.md)                  |
-| **Build with Gatsby**              | [Gatsby Patterns](.contentstack-vibe-docs/frameworks/gatsby.md)              |
-| **Implement OAuth login**         | [OAuth with Auth.js](.contentstack-vibe-docs/authentication/oauth.md)         |
-| **Create a CLI plugin**            | [CLI Plugins](.contentstack-vibe-docs/extensions/cli-plugins.md)             |
-| **Build a Developer Hub app**      | [DevHub Apps](.contentstack-vibe-docs/extensions/devhub-apps.md)             |
-| **See code examples**              | [Practical Examples](.contentstack-vibe-docs/examples/practical-examples.md) |
+| **Quickly look up a pattern**      | [QUICK_REFERENCE.md](contentstack-vibe-docs/QUICK_REFERENCE.md)             |
+| **Check package versions**         | [VERSIONS.md](contentstack-vibe-docs/VERSIONS.md)                           |
+| **Understand Contentstack basics** | [Base Concepts](contentstack-vibe-docs/concepts/base-concepts.md)           |
+| **Configure regions**              | [Regions Guide](contentstack-vibe-docs/concepts/regions.md)                 |
+| **Use the REST API**               | [REST API](contentstack-vibe-docs/api/rest-api.md)                          |
+| **Use GraphQL**                    | [GraphQL API](contentstack-vibe-docs/api/graphql-api.md)                    |
+| **Use the TypeScript SDK**         | [Delivery SDK](contentstack-vibe-docs/sdk/delivery-sdk.md)                  |
+| **Implement Live Preview**         | [Live Preview Concepts](contentstack-vibe-docs/live-preview/concepts.md)    |
+| **Build with Next.js**             | [Next.js Patterns](contentstack-vibe-docs/frameworks/nextjs.md)             |
+| **Build with Nuxt**                | [Nuxt Patterns](contentstack-vibe-docs/frameworks/nuxt.md)                  |
+| **Build with Gatsby**              | [Gatsby Patterns](contentstack-vibe-docs/frameworks/gatsby.md)              |
+| **Implement OAuth login**         | [OAuth with Auth.js](contentstack-vibe-docs/authentication/oauth.md)         |
+| **Create a CLI plugin**            | [CLI Plugins](contentstack-vibe-docs/extensions/cli-plugins.md)             |
+| **Build a Developer Hub app**      | [DevHub Apps](contentstack-vibe-docs/extensions/devhub-apps.md)             |
+| **See code examples**              | [Practical Examples](contentstack-vibe-docs/examples/practical-examples.md) |
 
 ---
 
@@ -93,7 +93,7 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 ## Documentation Structure
 
 ```
-.contentstack-vibe-docs/
+contentstack-vibe-docs/
 ├── QUICK_REFERENCE.md      # Condensed patterns for quick lookup
 ├── VERSIONS.md             # Package version compatibility
 ├── concepts/
@@ -127,21 +127,21 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 
 ### For New Projects
 
-1. [Base Concepts](.contentstack-vibe-docs/concepts/base-concepts.md) - Understand the CMS
-2. [Delivery SDK](.contentstack-vibe-docs/sdk/delivery-sdk.md) - Set up SDK
-3. Framework guide ([Next.js](.contentstack-vibe-docs/frameworks/nextjs.md), [Nuxt](.contentstack-vibe-docs/frameworks/nuxt.md), or [Gatsby](.contentstack-vibe-docs/frameworks/gatsby.md))
-4. [Live Preview Concepts](.contentstack-vibe-docs/live-preview/concepts.md) - If needed
-5. [Practical Examples](.contentstack-vibe-docs/examples/practical-examples.md) - Reference patterns
+1. [Base Concepts](contentstack-vibe-docs/concepts/base-concepts.md) - Understand the CMS
+2. [Delivery SDK](contentstack-vibe-docs/sdk/delivery-sdk.md) - Set up SDK
+3. Framework guide ([Next.js](contentstack-vibe-docs/frameworks/nextjs.md), [Nuxt](contentstack-vibe-docs/frameworks/nuxt.md), or [Gatsby](contentstack-vibe-docs/frameworks/gatsby.md))
+4. [Live Preview Concepts](contentstack-vibe-docs/live-preview/concepts.md) - If needed
+5. [Practical Examples](contentstack-vibe-docs/examples/practical-examples.md) - Reference patterns
 
 ### For Existing Projects
 
-1. [QUICK_REFERENCE.md](.contentstack-vibe-docs/QUICK_REFERENCE.md) - Quick patterns
+1. [QUICK_REFERENCE.md](contentstack-vibe-docs/QUICK_REFERENCE.md) - Quick patterns
 2. Specific feature docs as needed
 
 ### For Extensions
 
-- CLI plugins: [CLI Plugins Guide](.contentstack-vibe-docs/extensions/cli-plugins.md)
-- DevHub apps: [DevHub Apps Guide](.contentstack-vibe-docs/extensions/devhub-apps.md)
+- CLI plugins: [CLI Plugins Guide](contentstack-vibe-docs/extensions/cli-plugins.md)
+- DevHub apps: [DevHub Apps Guide](contentstack-vibe-docs/extensions/devhub-apps.md)
 
 ---
 
