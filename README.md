@@ -12,6 +12,8 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 | **Configure regions**              | [Regions Guide](contentstack-vibe-docs/concepts/regions.md)                 |
 | **Use the REST API**               | [REST API](contentstack-vibe-docs/api/rest-api.md)                          |
 | **Use GraphQL**                    | [GraphQL API](contentstack-vibe-docs/api/graphql-api.md)                    |
+| **Manage content (CRUD)**          | [Content Management API](contentstack-vibe-docs/api/content-management-api.md) |
+| **Transform images**              | [Image Delivery API](contentstack-vibe-docs/api/image-delivery-api.md)      |
 | **Use the TypeScript SDK**         | [Delivery SDK](contentstack-vibe-docs/sdk/delivery-sdk.md)                  |
 | **Implement Live Preview**         | [Live Preview Concepts](contentstack-vibe-docs/live-preview/concepts.md)    |
 | **Build with Next.js**             | [Next.js Patterns](contentstack-vibe-docs/frameworks/nextjs.md)             |
@@ -46,7 +48,7 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 - **Need references included?** - `.includeReference()` usage
 - **Using modular blocks?** - Rendering patterns
 - **Multiple locales?** - Locale handling
-- **Need image transforms?** - Asset handling
+- **Need image transforms?** - [Image Delivery API](contentstack-vibe-docs/api/image-delivery-api.md)
 
 #### Authentication
 
@@ -58,8 +60,9 @@ Comprehensive documentation for building applications with Contentstack CMS. Spe
 
 #### API vs SDK
 
-- **Use SDK** when: JavaScript/TypeScript, need type safety, need Live Preview
+- **Use Delivery SDK** when: JavaScript/TypeScript, need type safety, need Live Preview
 - **Use REST/GraphQL directly** when: Non-JS languages, fine-grained control
+- **Use Management API/SDK** when: Creating, updating, deleting, or publishing content programmatically
 
 #### Live Preview SDK Mode (`ssr` setting)
 
@@ -100,8 +103,10 @@ contentstack-vibe-docs/
 │   ├── base-concepts.md    # CMS fundamentals
 │   └── regions.md          # Region configuration guide
 ├── api/
-│   ├── rest-api.md         # REST API usage
-│   └── graphql-api.md      # GraphQL API usage
+│   ├── rest-api.md                # REST Content Delivery API
+│   ├── graphql-api.md             # GraphQL Content Delivery API
+│   ├── content-management-api.md  # Content Management API (CRUD)
+│   └── image-delivery-api.md      # Image Delivery API (transforms)
 ├── sdk/
 │   └── delivery-sdk.md     # TypeScript SDK guide
 ├── live-preview/
@@ -158,8 +163,10 @@ contentstack-vibe-docs/
 ### Comprehensive Coverage
 
 - CMS concepts and terminology
-- REST and GraphQL APIs
-- TypeScript Delivery SDK
+- REST and GraphQL Content Delivery APIs
+- Content Management API (CRUD operations)
+- Image Delivery API (transforms and optimization)
+- TypeScript Delivery and Management SDKs
 - Live Preview (CSR and SSR)
 - Authentication (OAuth with Auth.js)
 - Framework-specific patterns
@@ -176,7 +183,7 @@ All regions supported: US, EU, AU, Azure NA/EU, GCP NA/EU
 
 ### Security
 
-- Never expose Management Tokens in frontend
+- Never expose Management Tokens in frontend code
 - Use Delivery Tokens for public apps
 - Use Preview Tokens only in preview environments
 - Store credentials in environment variables

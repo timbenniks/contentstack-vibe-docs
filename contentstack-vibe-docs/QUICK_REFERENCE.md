@@ -250,12 +250,38 @@ console.log(asset.url, asset.title, asset.filename);
 ### Image Transformations
 
 ```typescript
-// Width and height
-`${asset.url}?width=800&height=600` // WebP format with quality
-`${asset.url}?format=webp&quality=85` // Crop fit
-`${asset.url}?width=400&height=300&fit=crop` // Auto optimization
-`${asset.url}?auto=webp`;
+// Resize
+`${asset.url}?width=800&height=600&environment=production`
+
+// WebP format with quality
+`${asset.url}?format=webp&quality=85&environment=production`
+
+// Crop to exact dimensions
+`${asset.url}?width=400&height=300&fit=crop&environment=production`
+
+// Cover (fill area, crop overflow)
+`${asset.url}?width=400&height=300&fit=cover&environment=production`
+
+// Auto-serve modern format with fallback
+`${asset.url}?auto=avif&format=webp&quality=80&environment=production`
+
+// Retina 2x
+`${asset.url}?width=400&dpr=2&format=webp&environment=production`
+
+// Aspect ratio crop
+`${asset.url}?crop=16:9&environment=production`
+
+// Grayscale
+`${asset.url}?saturation=-100&environment=production`
+
+// LQIP placeholder (tiny + blurred)
+`${asset.url}?width=40&blur=20&quality=30&format=webp&environment=production`
+
+// Prevent upscaling
+`${asset.url}?width=1200&disable=upscale&environment=production`
 ```
+
+See [Image Delivery API](api/image-delivery-api.md) for all parameters.
 
 ---
 
@@ -336,12 +362,116 @@ try {
 
 ---
 
+## Content Management API (CRUD)
+
+### Initialize Management SDK
+
+```typescript
+// lib/contentstack-management.ts
+import * as contentstack from "@contentstack/management";
+
+const client = contentstack.client();
+export const stack = client.stack({
+  api_key: process.env.CONTENTSTACK_API_KEY!,
+  management_token: process.env.CONTENTSTACK_MANAGEMENT_TOKEN!,
+});
+```
+
+### Create an Entry
+
+```typescript
+const entry = await stack.contentType("blog_post").entry().create({
+  entry: {
+    title: "My Post",
+    url: "/blog/my-post",
+    body: "<p>Hello world</p>",
+  },
+});
+```
+
+### Update an Entry
+
+```typescript
+const entry = await stack.contentType("blog_post").entry("blt1234567890").fetch();
+entry.title = "Updated Title";
+await entry.update();
+```
+
+### Publish an Entry
+
+```typescript
+await stack.contentType("blog_post").entry("blt1234567890").publish({
+  entry: {
+    environments: ["production"],
+    locales: ["en-us"],
+  },
+});
+```
+
+### Delete an Entry
+
+```typescript
+await stack.contentType("blog_post").entry("blt1234567890").delete();
+```
+
+### Upload an Asset
+
+```typescript
+import * as fs from "fs";
+
+const asset = await stack.asset().create({
+  asset: {
+    upload: fs.createReadStream("/path/to/image.jpg"),
+    title: "Hero Image",
+  },
+});
+```
+
+### Bulk Publish
+
+```typescript
+await stack.bulkOperation().publish({
+  entries: [
+    { uid: "entry_uid_1", content_type: "blog_post", locale: "en-us" },
+    { uid: "entry_uid_2", content_type: "blog_post", locale: "en-us" },
+  ],
+  locales: ["en-us"],
+  environments: ["production"],
+});
+```
+
+### REST API (curl)
+
+```bash
+# Create entry
+curl -X POST 'https://api.contentstack.io/v3/content_types/blog_post/entries' \
+  -H 'api_key: YOUR_API_KEY' \
+  -H 'authorization: YOUR_MANAGEMENT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"entry": {"title": "My Post"}}'
+
+# Publish entry
+curl -X POST 'https://api.contentstack.io/v3/content_types/blog_post/entries/ENTRY_UID/publish' \
+  -H 'api_key: YOUR_API_KEY' \
+  -H 'authorization: YOUR_MANAGEMENT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"entry": {"environments": ["production"], "locales": ["en-us"]}}'
+```
+
+See [Content Management API](api/content-management-api.md) for full reference.
+
+---
+
 ## Environment Variables
 
 ```bash
+# Content Delivery
 CONTENTSTACK_API_KEY=your_api_key
 CONTENTSTACK_DELIVERY_TOKEN=your_delivery_token
 CONTENTSTACK_PREVIEW_TOKEN=your_preview_token
 CONTENTSTACK_ENVIRONMENT=production
 CONTENTSTACK_REGION=us
+
+# Content Management (server-side only)
+CONTENTSTACK_MANAGEMENT_TOKEN=your_management_token
 ```
