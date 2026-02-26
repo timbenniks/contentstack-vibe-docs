@@ -81,12 +81,16 @@ When a task requires multiple docs, read only these combinations:
 - **`ssr: false`**: Uses postMessage. CMS sends data changes to iframe, client JS re-fetches and updates UI instantly (no page refresh)
 - **`ssr: true`**: CMS refreshes the iframe with query params (`?live_preview=hash&entry_uid=...`). Server reads params and fetches preview data
 
+## Security: Credentials Handling
+
+**NEVER ask the developer to share API keys, tokens, or secrets in the conversation.** Always use environment variable references (`process.env.CONTENTSTACK_API_KEY`, etc.) in code. Never output, log, or hardcode actual credential values. If the developer pastes a real token, warn them and suggest they rotate it.
+
 ## Questions to Ask Developers First
 
 ### Basic Setup
 
 - **What Contentstack region?** (US, EU, AU, Azure, GCP) — Required for endpoints
-- **Do you have credentials?** (API Key, Delivery Token, Preview Token)
+- **Do you have credentials set up?** (API Key, Delivery Token, Preview Token as environment variables — do NOT ask for the actual values)
 - **What environment?** (production, staging, preview)
 
 ### Framework & Architecture
@@ -123,7 +127,10 @@ When a task requires multiple docs, read only these combinations:
 
 **Never do these:**
 
+- Ask the developer for actual API keys, tokens, or secrets — always reference `process.env.*` variables
+- Output, log, or echo credential values in code, scripts, or responses
 - Hardcode API keys or tokens — use environment variables
+- Commit `.env` files or credentials to version control
 - Use Management Tokens in frontend code — server-side only
 - Read all reference files — pick only what you need
 - Skip error handling

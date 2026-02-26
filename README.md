@@ -123,6 +123,19 @@ All regions supported: US, EU, AU, Azure NA/EU, GCP NA/EU.
 
 ---
 
+## Security & Guardrails
+
+This skill includes built-in security measures and red flags that instruct agents to handle credentials safely:
+
+- **No secret leaking** — Agents are explicitly told to never ask for, output, log, or hardcode API keys, tokens, or secrets. All code uses `process.env.*` references.
+- **Credential hygiene** — If a developer accidentally pastes a real token in the conversation, the agent is instructed to warn them and suggest they rotate it.
+- **Frontend protection** — Management Tokens are flagged as server-side only. Agents are told to never expose them in frontend code.
+- **`.env` safety** — Agents are instructed to never commit `.env` files or credentials to version control.
+- **Red flags checklist** — A dedicated "Red Flags" section in `SKILL.md` lists specific anti-patterns agents must avoid, from hardcoding secrets to mixing SDK patterns incorrectly.
+- **Questions before code** — Agents are guided to ask about region, framework, and environment setup before writing any code, ensuring the right patterns are used from the start.
+
+---
+
 ## Documentation Structure
 
 ```
