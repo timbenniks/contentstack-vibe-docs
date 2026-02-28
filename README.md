@@ -23,7 +23,7 @@ Install for specific agents only:
 ```bash
 npx skills add timbenniks/contentstack-vibe-docs -a claude-code
 npx skills add timbenniks/contentstack-vibe-docs -a cursor
-npx skills add timbenniks/contentstack-vibe-docs -a copilot
+npx skills add timbenniks/contentstack-vibe-docs -a github-copilot
 ```
 
 Install globally (available in all your projects):
