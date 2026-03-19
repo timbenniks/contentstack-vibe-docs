@@ -74,6 +74,20 @@ npx skills check             # Check for updates
 npx skills update            # Update all skills
 ```
 
+### Cursor rules
+
+This repo includes Cursor rules in `rules/contentstack.mdc` — routing table, decision helpers, security guardrails, and quick patterns. For Cursor to auto-detect them, copy into your workspace:
+
+```bash
+mkdir -p .cursor/rules && cp rules/contentstack.mdc .cursor/rules/
+```
+
+Or symlink to keep rules in sync when you update the skill:
+
+```bash
+mkdir -p .cursor/rules && ln -sf ../../rules/contentstack.mdc .cursor/rules/contentstack.mdc
+```
+
 ---
 
 ## How It Works
@@ -139,6 +153,9 @@ This skill includes built-in security measures and red flags that instruct agent
 ## Documentation Structure
 
 ```
+rules/
+└── contentstack.mdc         # Cursor rules (routing, helpers, security)
+
 references/
 ├── QUICK_REFERENCE.md          # Condensed patterns for quick lookup
 ├── VERSIONS.md                 # Package version compatibility
