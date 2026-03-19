@@ -74,19 +74,16 @@ npx skills check             # Check for updates
 npx skills update            # Update all skills
 ```
 
-### Cursor rules
+### Cursor Plugin
 
-This repo includes Cursor rules in `rules/contentstack.mdc` — routing table, decision helpers, security guardrails, and quick patterns. For Cursor to auto-detect them, copy into your workspace:
+This repo is also a [Cursor plugin](https://github.com/stripe/ai). Install it directly in Cursor:
 
-```bash
-mkdir -p .cursor/rules && cp rules/contentstack.mdc .cursor/rules/
-```
+1. Open Cursor Settings > Plugins
+2. Add this repository URL: `https://github.com/timbenniks/contentstack-vibe-docs`
 
-Or symlink to keep rules in sync when you update the skill:
-
-```bash
-mkdir -p .cursor/rules && ln -sf ../../rules/contentstack.mdc .cursor/rules/contentstack.mdc
-```
+The plugin includes:
+- **Skills** — the full Contentstack documentation skill with routing and references
+- **Rules** — `rules/contentstack.mdc` with routing table, decision helpers, security guardrails, and quick patterns
 
 ---
 
@@ -152,7 +149,20 @@ This skill includes built-in security measures and red flags that instruct agent
 
 ## Documentation Structure
 
+This repo follows the [Open Plugins](https://open-plugins.com/plugin-builders) standard:
+
 ```
+.plugin/
+└── plugin.json              # Open Plugins manifest (Claude Code, OpenCode, etc.)
+
+.cursor-plugin/
+└── plugin.json              # Cursor plugin manifest
+
+skills/
+└── contentstack-vibe-docs/
+    ├── SKILL.md → ../../SKILL.md        # Symlink to root skill
+    └── references → ../../references    # Symlink to root references
+
 rules/
 └── contentstack.mdc         # Cursor rules (routing, helpers, security)
 
