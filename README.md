@@ -74,6 +74,23 @@ npx skills check             # Check for updates
 npx skills update            # Update all skills
 ```
 
+### Claude Code Plugin
+
+This repo is also a [Claude Code plugin](https://code.claude.com/docs/en/plugins). Install it directly:
+
+```bash
+claude plugin install https://github.com/timbenniks/contentstack-vibe-docs
+```
+
+Or test locally during development:
+
+```bash
+claude --plugin-dir ./contentstack-vibe-docs
+```
+
+The plugin includes:
+- **Skills** — the full Contentstack documentation skill with routing and references
+
 ### Cursor Plugin
 
 This repo is also a [Cursor plugin](https://github.com/stripe/ai). Install it directly in Cursor:
@@ -153,7 +170,10 @@ This repo follows the [Open Plugins](https://open-plugins.com/plugin-builders) s
 
 ```
 .plugin/
-└── plugin.json              # Open Plugins manifest (Claude Code, OpenCode, etc.)
+└── plugin.json              # Open Plugins manifest (OpenCode, etc.)
+
+.claude-plugin/
+└── plugin.json              # Claude Code plugin manifest
 
 .cursor-plugin/
 └── plugin.json              # Cursor plugin manifest
