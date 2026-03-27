@@ -93,7 +93,7 @@ The plugin includes:
 
 ### Cursor Plugin
 
-This repo is also a [Cursor plugin](https://github.com/stripe/ai). Install it directly in Cursor:
+This repo is also a [Cursor plugin](https://cursor.directory/plugins/contentstack). Install it directly in Cursor:
 
 1. Open Cursor Settings > Plugins
 2. Add this repository URL: `https://github.com/timbenniks/contentstack-vibe-docs`
