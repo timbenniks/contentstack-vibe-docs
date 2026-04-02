@@ -319,7 +319,7 @@ curl -X POST 'https://api.contentstack.io/v3/content_types' \
 | Number | `number` | -- |
 | Boolean | `boolean` | -- |
 | Date | `isodate` | `startDate`, `endDate` |
-| Select/Dropdown | `text` | `enum` with choices array |
+| Select/Dropdown | `text` | `enum` with choices array, **requires `display_type: "dropdown"`** |
 | File | `file` | `extensions` array for allowed types |
 | Link | `link` | -- |
 | Reference | `reference` | `reference_to` (array of content type UIDs) |
@@ -341,6 +341,38 @@ curl -X POST 'https://api.contentstack.io/v3/content_types' \
 | `field_metadata.default_value` | any | Default value |
 | `field_metadata.instruction` | string | Editor instruction |
 | `field_metadata.placeholder` | string | Input placeholder |
+
+### Important Notes for Content Type Creation
+
+**Enum/Dropdown fields require `display_type`**: When using `enum` with choices, you must include `display_type: "dropdown"` on the field or the API will reject the request.
+
+```json
+{
+  "display_name": "Status",
+  "uid": "status",
+  "data_type": "text",
+  "enum": {
+    "advanced": false,
+    "choices": [
+      { "value": "available" },
+      { "value": "pending" },
+      { "value": "adopted" }
+    ]
+  },
+  "display_type": "dropdown"
+}
+```
+
+**`is_page: true` requires a `url` field**: If you set `options.is_page` to `true`, the schema **must** include a field with `"uid": "url"`. Without it, the API returns a validation error. This `url` field is also required for **Live Preview** and **Visual Builder** to route correctly to the entry in the preview iframe.
+
+```json
+{
+  "display_name": "URL",
+  "uid": "url",
+  "data_type": "text",
+  "mandatory": true
+}
+```
 
 ---
 

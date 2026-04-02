@@ -43,7 +43,7 @@ export const stack = contentstack.stack({
   live_preview: {
     enable: true,
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
-    host: endpoints.contentPreview, // Already without https://
+    host: endpoints.preview, // Already without https://
   },
 });
 ```
@@ -59,6 +59,8 @@ const entry = await stack.contentType("blog_post").entry("entry_uid").fetch();
 ```
 
 ### Single Entry with References
+
+**Important**: `includeReference()` is called on `entry()`, before `.query()` or `.fetch()`.
 
 ```typescript
 const entry = await stack
@@ -93,7 +95,7 @@ const result = await stack
   .skip(0)
   .limit(10)
   .includeCount()
-  .descending("published_date")
+  .orderByDescending("published_date")
   .find();
 
 // result.entries = array of entries
@@ -120,18 +122,23 @@ import { QueryOperation } from "@contentstack/delivery-sdk";
 // Equals
 .where("status", QueryOperation.EQUALS, "published")
 
-// Not equals
-.where("status", QueryOperation.NOT_EQUAL, "draft")
+// Not equals (note: NOT_EQUALS, not NOT_EQUAL)
+.where("status", QueryOperation.NOT_EQUALS, "draft")
 
-// Greater/Less than
-.where("price", QueryOperation.GREATER_THAN, 100)
-.where("price", QueryOperation.LESS_THAN_OR_EQUAL, 500)
+// Greater/Less than (note: IS_ prefix)
+.where("price", QueryOperation.IS_GREATER_THAN, 100)
+.where("price", QueryOperation.IS_LESS_THAN_OR_EQUAL, 500)
 
-// In array
-.where("category", QueryOperation.IN, ["tech", "design"])
+// In array (note: INCLUDES/EXCLUDES, not IN/NOT_IN)
+.where("category", QueryOperation.INCLUDES, ["tech", "design"])
 
-// Contains
-.where("title", QueryOperation.CONTAINS, "tutorial")
+// Regex match
+.where("title", QueryOperation.MATCHES, "tutorial")
+
+// Convenience methods (alternative to .where with QueryOperation)
+query.equalTo("status", "published")
+query.notEqualTo("status", "draft")
+query.containedIn("category", ["tech", "design"])
 
 // Complex query
 .addQuery({
@@ -147,14 +154,14 @@ import { QueryOperation } from "@contentstack/delivery-sdk";
 ## Sorting
 
 ```typescript
-// Ascending
-.ascending("published_date")
+// Ascending (note: orderByAscending, not ascending)
+.orderByAscending("published_date")
 
-// Descending
-.descending("published_date")
+// Descending (note: orderByDescending, not descending)
+.orderByDescending("published_date")
 
 // Multiple
-.ascending("category").descending("published_date")
+.orderByAscending("category").orderByDescending("published_date")
 ```
 
 ---
@@ -300,7 +307,7 @@ const endpoints = getContentstackEndpoints("us", true); // or "eu", "au", "azure
 endpoints.contentDelivery; // REST CDN
 endpoints.contentManagement; // Management API
 endpoints.graphqlDelivery; // GraphQL
-endpoints.contentPreview; // REST Preview
+endpoints.preview; // REST Preview
 endpoints.graphqlPreview; // GraphQL Preview
 ```
 
