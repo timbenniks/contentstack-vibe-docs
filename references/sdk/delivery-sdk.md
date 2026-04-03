@@ -41,6 +41,24 @@ export const stack = contentstack.stack({
 });
 ```
 
+**Important**: For SSR Live Preview (`ssr: true`) or Visual Builder, create a **new stack instance per request** to avoid cross-session data leakage. Use a factory function:
+
+```typescript
+export function createStack() {
+  return contentstack.stack({
+    apiKey: process.env.CONTENTSTACK_API_KEY!,
+    deliveryToken: process.env.CONTENTSTACK_DELIVERY_TOKEN!,
+    environment: process.env.CONTENTSTACK_ENVIRONMENT!,
+    region: "us",
+    live_preview: {
+      enable: true,
+      preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
+      host: "rest-preview.contentstack.com",
+    },
+  });
+}
+```
+
 ### Using Endpoints Package (Recommended)
 
 The `@timbenniks/contentstack-endpoints` package (v2.1.0+) automatically resolves correct endpoints for all regions:
@@ -69,7 +87,7 @@ export const stack = contentstack.stack({
   live_preview: {
     enable: true,
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
-    host: endpoints.contentPreview, // Already without https://
+    host: endpoints.preview, // Already without https://
   },
 });
 ```
@@ -95,7 +113,7 @@ export const stack = contentstack.stack({
   live_preview: {
     enable: true,
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
-    host: endpoints.contentPreview, // Already without https://
+    host: endpoints.preview, // Already without https://
   },
 });
 ```
@@ -105,7 +123,7 @@ export const stack = contentstack.stack({
 - `endpoints.contentDelivery` - REST CDN endpoint
 - `endpoints.contentManagement` - Management API endpoint
 - `endpoints.graphqlDelivery` - GraphQL endpoint
-- `endpoints.contentPreview` - REST Preview endpoint
+- `endpoints.preview` - REST Preview endpoint
 - `endpoints.graphqlPreview` - GraphQL Preview endpoint
 
 **Note**: When `omitHttps: true` is passed, all endpoints return domains without `https://` prefix, which is what SDKs expect for the `host` parameter.
@@ -132,6 +150,8 @@ const entry = await stack
 
 ### With References
 
+**Important**: `includeReference()` is called on `entry()`, before `.query()` or `.fetch()`.
+
 ```typescript
 const entry = await stack
   .contentType("blog_post")
@@ -142,6 +162,17 @@ const entry = await stack
 // Access referenced entries
 console.log(entry.author.title);
 console.log(entry.category.title);
+```
+
+When querying multiple entries with references:
+
+```typescript
+const result = await stack
+  .contentType("blog_post")
+  .entry()
+  .includeReference(["author"])  // before .query()
+  .query()
+  .find();
 ```
 
 ### Multiple Entries
@@ -182,7 +213,7 @@ const result = await stack
   .entry()
   .query()
   .where("category", QueryOperation.EQUALS, "tech")
-  .where("published_date", QueryOperation.LESS_THAN_OR_EQUAL, "2024-01-01")
+  .where("published_date", QueryOperation.IS_LESS_THAN_OR_EQUAL, "2024-01-01")
   .find();
 ```
 
@@ -207,30 +238,44 @@ const result = await stack
 ```typescript
 import { QueryOperation } from "@contentstack/delivery-sdk";
 
-QueryOperation.EQUALS; // ==
-QueryOperation.NOT_EQUAL; // !=
-QueryOperation.GREATER_THAN; // >
-QueryOperation.GREATER_THAN_OR_EQUAL; // >=
-QueryOperation.LESS_THAN; // <
-QueryOperation.LESS_THAN_OR_EQUAL; // <=
-QueryOperation.IN; // in array
-QueryOperation.NOT_IN; // not in array
-QueryOperation.EXISTS; // field exists
-QueryOperation.CONTAINS; // contains string
-QueryOperation.NOT_CONTAINS; // does not contain
+QueryOperation.EQUALS;                    // ==
+QueryOperation.NOT_EQUALS;                // != (note: NOT_EQUALS, not NOT_EQUAL)
+QueryOperation.IS_GREATER_THAN;           // >
+QueryOperation.IS_GREATER_THAN_OR_EQUAL;  // >=
+QueryOperation.IS_LESS_THAN;              // <
+QueryOperation.IS_LESS_THAN_OR_EQUAL;     // <=
+QueryOperation.INCLUDES;                  // in array
+QueryOperation.EXCLUDES;                  // not in array
+QueryOperation.EXISTS;                    // field exists
+QueryOperation.MATCHES;                   // regex match
+```
+
+The query object also has convenience methods that can be chained:
+
+```typescript
+query.equalTo("field", value);
+query.notEqualTo("field", value);
+query.lessThan("field", value);
+query.greaterThan("field", value);
+query.containedIn("field", [values]);
+query.notContainedIn("field", [values]);
+query.exists("field");
+query.notExists("field");
 ```
 
 ### Sorting
 
+**Important**: The methods are `orderByAscending` and `orderByDescending` (not `ascending`/`descending`).
+
 ```typescript
 // Ascending
-.ascending("published_date")
+.orderByAscending("published_date")
 
 // Descending
-.descending("published_date")
+.orderByDescending("published_date")
 
 // Multiple
-.ascending("category").descending("published_date")
+.orderByAscending("category").orderByDescending("published_date")
 ```
 
 ### Pagination
@@ -415,7 +460,10 @@ export async function getEntries(
 
   if (options?.limit) query.limit(options.limit);
   if (options?.skip) query.skip(options.skip);
-  if (options?.references) query.includeReference(options.references);
+  if (options?.references) {
+    // Note: includeReference is on entry(), not query()
+    // For queries with references, call it before .query()
+  }
 
   return query.includeCount().find();
 }
@@ -429,3 +477,4 @@ export async function getEntries(
 4. **Use TypeScript** - Define interfaces for type safety
 5. **Include only needed references** - Keep includes under 10
 6. **Implement pagination** - Don't fetch all entries at once
+7. **Chain order matters** - `includeReference()` goes on `entry()` before `.query()`, sorting/pagination go on `.query()`

@@ -22,6 +22,7 @@ This repo is an AI agent skill (~10,000 lines across 20 reference files). **Neve
 | Live Preview concepts | `references/live-preview/concepts.md` |
 | Live Preview CSR (ssr:false) | `references/live-preview/csr-mode.md` |
 | Live Preview SSR (ssr:true) | `references/live-preview/ssr-mode.md` |
+| Visual Builder (Next.js) | `references/frameworks/nextjs.md` (Visual Builder section) |
 | Next.js integration | `references/frameworks/nextjs.md` |
 | Nuxt integration | `references/frameworks/nuxt.md` |
 | Gatsby integration | `references/frameworks/gatsby.md` |
@@ -38,6 +39,7 @@ This repo is an AI agent skill (~10,000 lines across 20 reference files). **Neve
 | New Next.js project | base-concepts → delivery-sdk → nextjs |
 | New Nuxt project | base-concepts → delivery-sdk → nuxt |
 | Add Live Preview (Next.js) | live-preview/concepts → ssr-mode → nextjs |
+| Add Visual Builder (Next.js) | live-preview/concepts → ssr-mode → nextjs (Visual Builder section) |
 | Add Live Preview (Nuxt) | live-preview/concepts → csr-mode → nuxt |
 | Content pipeline (CRUD) | content-management-api |
 | Responsive images | image-delivery-api |
@@ -63,6 +65,11 @@ The `ssr` setting controls how updates work inside the CMS iframe, NOT the site'
 
 - **`ssr: false`** — postMessage: CMS pushes data, client JS re-renders instantly
 - **`ssr: true`** — iframe refresh: server reads `?live_preview=hash&entry_uid=...` query params
+
+### Live Preview vs Visual Builder?
+
+- **`mode: "preview"`** — Basic Live Preview: edit buttons, field highlighting, jump-to-field
+- **`mode: "builder"`** — Visual Builder: inline editing, drag-and-drop reorder of multiple fields, visual editing UI. Requires `ssr: true` and content types with `url` field (`is_page: true`)
 
 ## Stack Init Pattern
 
@@ -113,7 +120,15 @@ export const stack = contentstack.stack({
 - Mixing Delivery SDK patterns with Management SDK patterns
 - Mixing REST and GraphQL patterns incorrectly
 - Forgetting `.includeReference()` when content types have references
+- Calling `.includeReference()` on `.query()` instead of on `.entry()` — chain order: `entry().includeReference([...]).query().find()`
+- Using `.descending()` / `.ascending()` instead of `.orderByDescending()` / `.orderByAscending()`
+- Using `QueryOperation.NOT_EQUAL` instead of `NOT_EQUALS`, or `GREATER_THAN` instead of `IS_GREATER_THAN`
+- Using `endpoints.contentPreview` instead of `endpoints.preview` from `@timbenniks/contentstack-endpoints`
 - Hardcoding region endpoints instead of using `@timbenniks/contentstack-endpoints`
+- Creating enum/dropdown fields without `display_type: "dropdown"` (CMA rejects them)
+- Setting `is_page: true` on a content type without adding a `url` field to the schema
+- Importing server-side `createStack()` into client components (use `NEXT_PUBLIC_` vars instead)
+- Using `item.$._` for multiple field reorder tags instead of `entry.$[`field__${index}`]`
 
 ## Questions to Ask First
 
