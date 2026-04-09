@@ -230,12 +230,12 @@ async function getBlogPosts(page = 1, pageSize = 10) {
   const result = await stack
     .contentType("blog_post")
     .entry()
+    .includeReference(["author"])
     .query()
     .skip(skip)
     .limit(pageSize)
     .includeCount()
-    .includeReference(["author"])
-    .descending("published_date")
+    .orderByDescending("published_date")
     .find();
 
   return {
@@ -275,7 +275,7 @@ async function getNavigation() {
     .contentType("navigation_item")
     .entry()
     .query()
-    .ascending("order")
+    .orderByAscending("order")
     .find();
 
   return result.entries;
@@ -406,4 +406,3 @@ if (error) {
   return <ErrorMessage message={error} />;
 }
 ```
-

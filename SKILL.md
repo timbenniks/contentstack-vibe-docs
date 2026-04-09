@@ -16,7 +16,7 @@ metadata:
 
 # Contentstack Documentation for AI Agents
 
-Comprehensive, AI-optimized documentation for the Contentstack CMS. This skill contains ~10,500 lines across 21 reference files.
+Comprehensive, AI-optimized documentation for the Contentstack CMS. This skill contains ~11,000 lines across 20 reference files.
 
 **STOP. Do not read all reference files.** Use the routing table below to read ONLY the 1-3 files relevant to your current task.
 
@@ -26,7 +26,7 @@ Match your task to the right file(s). Read the minimum set needed.
 
 | Task | Read this file | Lines |
 |------|---------------|-------|
-| Quick code pattern lookup | [QUICK_REFERENCE.md](references/QUICK_REFERENCE.md) | 477 |
+| Quick code pattern lookup | [QUICK_REFERENCE.md](references/QUICK_REFERENCE.md) | 488 |
 | Understand Contentstack basics | [base-concepts.md](references/concepts/base-concepts.md) | 166 |
 | Design content models / schema strategy | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
 | Choose references vs modular blocks vs global fields | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
@@ -35,13 +35,13 @@ Match your task to the right file(s). Read the minimum set needed.
 | Configure regions/endpoints | [regions.md](references/concepts/regions.md) | 350 |
 | Fetch content (REST) | [rest-api.md](references/api/rest-api.md) | 487 |
 | Fetch content (GraphQL) | [graphql-api.md](references/api/graphql-api.md) | 620 |
-| Create/update/delete/publish content | [content-management-api.md](references/api/content-management-api.md) | 1138 |
+| Create/update/delete/publish content | [content-management-api.md](references/api/content-management-api.md) | 1170 |
 | Transform/optimize images | [image-delivery-api.md](references/api/image-delivery-api.md) | 565 |
-| Use TypeScript Delivery SDK | [delivery-sdk.md](references/sdk/delivery-sdk.md) | 431 |
-| Implement Live Preview | [concepts.md](references/live-preview/concepts.md) | 131 |
+| Use TypeScript Delivery SDK | [delivery-sdk.md](references/sdk/delivery-sdk.md) | 480 |
+| Implement Live Preview | [concepts.md](references/live-preview/concepts.md) | 143 |
 | Live Preview (client-side, ssr:false) | [csr-mode.md](references/live-preview/csr-mode.md) | 268 |
-| Live Preview (server-side, ssr:true) | [ssr-mode.md](references/live-preview/ssr-mode.md) | 315 |
-| Build with Next.js | [nextjs.md](references/frameworks/nextjs.md) | 424 |
+| Live Preview (server-side, ssr:true) | [ssr-mode.md](references/live-preview/ssr-mode.md) | 367 |
+| Build with Next.js | [nextjs.md](references/frameworks/nextjs.md) | 604 |
 | Build with Nuxt | [nuxt.md](references/frameworks/nuxt.md) | 404 |
 | Build with Gatsby | [gatsby.md](references/frameworks/gatsby.md) | 433 |
 | Implement OAuth login | [oauth.md](references/authentication/oauth.md) | 906 |
@@ -176,7 +176,7 @@ export const stack = contentstack.stack({
   live_preview: {
     enable: true,
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
-    host: endpoints.contentPreview,
+    host: endpoints.preview,
   },
 });
 ```

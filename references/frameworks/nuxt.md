@@ -225,15 +225,18 @@ export function useContentstack() {
   }
 
   async function getBlogPosts(options?: { limit?: number; skip?: number }) {
-    const query = $stack.contentType("blog_post").entry().query();
+    const query = $stack
+      .contentType("blog_post")
+      .entry()
+      .includeReference(["author"])
+      .query();
 
     if (options?.limit) query.limit(options.limit);
     if (options?.skip) query.skip(options.skip);
 
     const result = await query
       .includeCount()
-      .includeReference(["author"])
-      .descending("published_date")
+      .orderByDescending("published_date")
       .find();
 
     result.entries.forEach((entry: any) => {
@@ -401,4 +404,3 @@ Ensure plugin file is in `plugins/` directory and TypeScript is configured.
 ### Hydration Mismatches
 
 Wrap client-only logic in `onMounted` or use `<ClientOnly>` component.
-

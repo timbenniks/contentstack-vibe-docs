@@ -83,7 +83,7 @@ const stack = contentstack.stack({
   live_preview: {
     enable: true,
     preview_token: process.env.CONTENTSTACK_PREVIEW_TOKEN,
-    host: endpoints.contentPreview, // Already without https://
+    host: endpoints.preview, // Already without https://
   },
 });
 ```
@@ -92,7 +92,7 @@ const stack = contentstack.stack({
 - `endpoints.contentDelivery` - REST CDN endpoint
 - `endpoints.contentManagement` - Management API endpoint
 - `endpoints.graphqlDelivery` - GraphQL endpoint
-- `endpoints.contentPreview` - REST Preview endpoint
+- `endpoints.preview` - REST Preview endpoint
 - `endpoints.graphqlPreview` - GraphQL Preview endpoint
 
 **Note**: When `omitHttps: true` is passed, all endpoints return domains without `https://` prefix, which is what SDKs expect for the `host` parameter.
@@ -347,4 +347,3 @@ const endpoints = getContentstackEndpoints(regionObj, true);
 - [Contentstack Regions Documentation](https://www.contentstack.com/docs/developers/contentstack-regions)
 - [Endpoints Package](https://www.npmjs.com/package/@timbenniks/contentstack-endpoints)
 - [Official Regions JSON](https://artifacts.contentstack.com/regions.json)
-

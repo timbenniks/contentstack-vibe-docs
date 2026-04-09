@@ -2,7 +2,7 @@
 
 An [Agent Skill](https://agentskills.io/) that gives AI coding agents comprehensive Contentstack CMS knowledge. Works with Claude Code, Cursor, GitHub Copilot, VS Code, Gemini CLI, Roo Code, and [25+ other tools](https://agentskills.io/).
 
-> **AI Agents: Read [SKILL.md](SKILL.md).** It contains routing rules that direct you to the 1-3 files you need. Do not read all files — this skill contains ~10,500 lines across 21 reference documents.
+> **AI Agents: Read [SKILL.md](SKILL.md).** It contains routing rules that direct you to the 1-3 files you need. Do not read all files — this skill contains ~11,000 lines across 20 reference documents.
 
 ---
 
@@ -110,7 +110,7 @@ This skill uses **progressive disclosure** to keep your agent's context window c
 
 1. **Discovery** (~100 tokens) — The agent loads the skill name and description. Just enough to know "this is relevant for Contentstack tasks."
 2. **Activation** (~3,500 tokens) — When a Contentstack task is detected, the agent reads `SKILL.md` with its routing table, decision helpers, and inline quick-start patterns.
-3. **Execution** (on-demand) — The routing table directs the agent to read only the 1-3 specific reference files it needs. It never loads all ~10,500 lines.
+3. **Execution** (on-demand) — The routing table directs the agent to read only the 1-3 specific reference files it needs. It never loads all ~11,000 lines.
 
 ```
 User: "Add live preview to my Next.js app"
