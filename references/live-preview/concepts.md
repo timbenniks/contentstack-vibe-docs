@@ -120,8 +120,20 @@ Your website must:
 ## SDK Version 3 Features
 
 - **Mode Property**: `"preview"` for Live Preview, `"builder"` for Visual Builder
+  - `"preview"`: Basic Live Preview with edit buttons and field highlighting
+  - `"builder"`: Full Visual Builder with inline editing, drag-and-drop reordering of multiple fields, and a visual editing UI
 - **Edit Button Config**: Customizable position and behavior
 - **Clean Production Tags**: `cleanCslpOnProduction` removes `data-cslp` in production
+
+## Visual Builder Requirements
+
+Visual Builder (`mode: "builder"`) has additional requirements beyond basic Live Preview:
+
+1. **URL field required**: Content types must have `is_page: true` and a `url` field. Visual Builder matches the iframe URL to the entry's `url` field to identify which entry is being edited.
+2. **Edit tags for multiple fields**: To enable add/delete/reorder on multiple group fields, use the `field__${index}` pattern:
+   - Container element: `{...(entry.$ && entry.$.field_name)}`
+   - Each item: `{...(entry.$?.[`field_name__${index}`])}`
+   - Item fields: `{...(item.$ && item.$.sub_field)}`
 
 ## Next Steps
 

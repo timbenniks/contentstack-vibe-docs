@@ -86,22 +86,34 @@ export async function getPageData(searchParams: URLSearchParams) {
 
 ### 3. Client-Side: Initialize SDK
 
+**Important**: The client component must create its own stack using `NEXT_PUBLIC_` env vars. Do NOT import server-side `createStack()` — server-only env vars are not available in client bundles.
+
 ```typescript
 // components/LivePreviewInit.tsx
 "use client";
 import { useEffect } from "react";
-import ContentstackLivePreview, { IStackSdk } from "@contentstack/live-preview-utils";
-import { createStack } from "@/lib/contentstack";
+import contentstack from "@contentstack/delivery-sdk";
+import ContentstackLivePreview from "@contentstack/live-preview-utils";
+import type { IStackSdk } from "@contentstack/live-preview-utils";
 
 export function LivePreviewInit() {
   useEffect(() => {
-    const stack = createStack();
-    
+    const stack = contentstack.stack({
+      apiKey: process.env.NEXT_PUBLIC_CONTENTSTACK_API_KEY!,
+      deliveryToken: "unused-on-client",
+      environment: process.env.NEXT_PUBLIC_CONTENTSTACK_ENVIRONMENT!,
+      region: process.env.NEXT_PUBLIC_CONTENTSTACK_REGION || "us",
+      live_preview: {
+        enable: true,
+        host: "rest-preview.contentstack.com",
+      },
+    });
+
     ContentstackLivePreview.init({
-      ssr: true, // SSR mode
+      ssr: true,
       enable: true,
-      mode: "preview",
-      stackSdk: stack.config as IStackSdk,
+      mode: "preview",  // or "builder" for Visual Builder
+      stackSdk: stack.config as unknown as IStackSdk,
       stackDetails: {
         apiKey: process.env.NEXT_PUBLIC_CONTENTSTACK_API_KEY!,
         environment: process.env.NEXT_PUBLIC_CONTENTSTACK_ENVIRONMENT!,
@@ -241,6 +253,46 @@ async function fetchPage(searchParams: URLSearchParams) {
   return request(`https://${host}/graphql`, query, { url: "/" }, headers);
 }
 ```
+
+## Visual Builder Mode
+
+Visual Builder extends Live Preview with inline editing and drag-and-drop reordering. To enable it, change `mode` from `"preview"` to `"builder"`:
+
+```typescript
+ContentstackLivePreview.init({
+  ssr: true,
+  enable: true,
+  mode: "builder",  // enables Visual Builder (vs "preview" for basic Live Preview)
+  // ... rest of config
+});
+```
+
+### URL Field Requirement
+
+Visual Builder identifies entries by matching the iframe URL to the entry's `url` field. Content types must:
+- Have `is_page: true` in their options
+- Include a `url` field in the schema
+- Query entries by `url`, not a custom slug field
+
+### Edit Tags for Multiple Fields (Add/Delete/Reorder)
+
+For multiple group fields (arrays), tag both the container and each item. Use the `field__${index}` pattern on the **parent entry's** `$` object:
+
+```typescript
+// Container gets the field-level tag
+<div {...(entry.$ && entry.$.page_components)}>
+  {entry.page_components?.map((component, index) => (
+    // Each item gets field__index from the PARENT entry's $
+    <div key={index} {...(entry.$?.[`page_components__${index}`])}>
+      <h3 {...(component.$ && component.$.title)}>{component.title}</h3>
+    </div>
+  ))}
+</div>
+```
+
+**Important**: The item-level tag uses `entry.$[`field__${index}`]` from the parent, NOT `item.$._`.
+
+---
 
 ## Important Notes
 
