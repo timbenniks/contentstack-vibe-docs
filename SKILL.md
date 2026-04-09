@@ -3,10 +3,11 @@ name: contentstack-vibe-docs
 description: >-
   Comprehensive Contentstack CMS documentation for building web applications.
   Covers REST API, GraphQL API, Content Management API, Image Delivery API,
-  TypeScript SDKs, Live Preview, OAuth authentication, and framework patterns
-  for Next.js, Nuxt, and Gatsby. Use when implementing any Contentstack feature,
-  fetching or managing content, setting up Live Preview, configuring regions,
-  building CLI plugins, or creating Developer Hub apps.
+  TypeScript SDKs, Live Preview, OAuth authentication, data modeling best
+  practices, and framework patterns for Next.js, Nuxt, and Gatsby. Use when
+  implementing any Contentstack feature, fetching or managing content, designing
+  schemas, setting up Live Preview, configuring regions, building CLI plugins,
+  or creating Developer Hub apps.
 license: MIT
 metadata:
   author: timbenniks
@@ -15,7 +16,7 @@ metadata:
 
 # Contentstack Documentation for AI Agents
 
-Comprehensive, AI-optimized documentation for the Contentstack CMS. This skill contains ~10,000 lines across 20 reference files.
+Comprehensive, AI-optimized documentation for the Contentstack CMS. This skill contains ~10,500 lines across 21 reference files.
 
 **STOP. Do not read all reference files.** Use the routing table below to read ONLY the 1-3 files relevant to your current task.
 
@@ -27,6 +28,10 @@ Match your task to the right file(s). Read the minimum set needed.
 |------|---------------|-------|
 | Quick code pattern lookup | [QUICK_REFERENCE.md](references/QUICK_REFERENCE.md) | 477 |
 | Understand Contentstack basics | [base-concepts.md](references/concepts/base-concepts.md) | 166 |
+| Design content models / schema strategy | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
+| Choose references vs modular blocks vs global fields | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
+| Plan taxonomy / tags / classification | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
+| Plan localization strategy / multi-channel modeling | [data-modeling-best-practices.md](references/concepts/data-modeling-best-practices.md) | 490 |
 | Configure regions/endpoints | [regions.md](references/concepts/regions.md) | 350 |
 | Fetch content (REST) | [rest-api.md](references/api/rest-api.md) | 487 |
 | Fetch content (GraphQL) | [graphql-api.md](references/api/graphql-api.md) | 620 |
@@ -53,6 +58,9 @@ When a task requires multiple docs, read only these combinations:
 |----------|------------------------|
 | **New Next.js project** | base-concepts.md, delivery-sdk.md, nextjs.md |
 | **New Nuxt project** | base-concepts.md, delivery-sdk.md, nuxt.md |
+| **Design a content model / schema** | data-modeling-best-practices.md, base-concepts.md |
+| **References vs modular blocks / global fields** | data-modeling-best-practices.md |
+| **Localization and multi-channel schema planning** | data-modeling-best-practices.md, base-concepts.md |
 | **Add Live Preview to Next.js** | live-preview/concepts.md, live-preview/ssr-mode.md, nextjs.md |
 | **Add Live Preview to Nuxt** | live-preview/concepts.md, live-preview/csr-mode.md, nuxt.md |
 | **Build a content pipeline (CRUD)** | content-management-api.md |
@@ -68,6 +76,11 @@ When a task requires multiple docs, read only these combinations:
 - Reading published content for a website/app -> REST API or GraphQL API or Delivery SDK
 - Creating, updating, deleting, or publishing content -> Content Management API
 - Transforming images (resize, crop, format) -> Image Delivery API
+
+### Which modeling guide?
+
+- Designing content types, references, global fields, modular blocks, taxonomy, or locale strategy -> `data-modeling-best-practices.md`
+- Need field type or platform basics first -> `base-concepts.md` before the modeling guide
 
 ### Which SDK?
 
@@ -102,8 +115,11 @@ When a task requires multiple docs, read only these combinations:
 ### Content Requirements
 
 - **What content types?** — Query patterns
+- **What has an independent lifecycle?** — Separate content type vs inline field
+- **What needs reuse vs page-local composition?** — Reference vs modular block
 - **Need references included?** — `.includeReference()` usage
 - **Using modular blocks?** — Rendering patterns
+- **Need global fields or taxonomy?** — Shared schema vs classification
 - **Multiple locales?** — Locale handling
 - **Need image transforms?** — Image Delivery API
 
@@ -218,7 +234,7 @@ The `references/` directory contains detailed documentation organized by topic:
 |-----------|----------|
 | `references/api/` | REST, GraphQL, Content Management, and Image Delivery API docs |
 | `references/sdk/` | TypeScript Delivery SDK guide |
-| `references/concepts/` | CMS fundamentals and region configuration |
+| `references/concepts/` | CMS fundamentals, data modeling guidance, and region configuration |
 | `references/frameworks/` | Next.js, Nuxt, and Gatsby integration patterns |
 | `references/live-preview/` | Live Preview concepts, CSR mode, and SSR mode |
 | `references/authentication/` | OAuth with Auth.js for Next.js |

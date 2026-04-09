@@ -2,6 +2,10 @@
 
 Condensed patterns for common Contentstack operations. Use this for quick lookups.
 
+## Routing Note
+
+For content modeling, schema design, references vs modular blocks, global fields, taxonomy, or localization strategy, read [concepts/data-modeling-best-practices.md](concepts/data-modeling-best-practices.md) before this file. This quick reference is for implementation patterns after the model is already decided.
+
 ## Stack Initialization (Use Once)
 
 ### Basic (Manual Region)
